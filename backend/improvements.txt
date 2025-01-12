@@ -1,0 +1,7 @@
+#Login Route-
+    1) Check if username exists but only password is wrong.
+    2) Encrypt and decrypt the password while sending it on the request response cycle.
+    3) Username is not unique field. Need to have a unique identifier field in users table
+    4) JWT token
+    5) Chat-Bot
+    6) SEO friendly

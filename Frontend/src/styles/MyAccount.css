@@ -1,0 +1,108 @@
+.card-header {
+    background: none;
+    padding: 0.5rem 1.5rem;
+    display: -ms-flexbox;
+    display: flex;
+    min-height: 3.5rem;
+    margin-bottom: 0;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.card-body {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0.5rem 1.5rem 1.5rem 1.5rem !important;
+    position: relative;
+}
+.text-center {
+    text-align: center !important;
+}
+
+.card-body> :last-child {
+    margin-bottom: 0;
+}
+.profile-pic {
+    text-align: center;
+}
+.profile-pic-img {
+    position: relative;
+    width: 5rem;
+    height: 5rem;
+    line-height: 5rem;
+    font-size: 2rem;
+    text-align: center;
+    margin: 0 auto;
+}
+.profile-pic-img span {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50px;
+    right: -1px;
+    top: 0.5rem;
+    border: 2px solid #fff;
+}
+.brround {
+    border-radius: 50%;
+}
+
+img {
+    max-width: 100%;
+}
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+.text-dark {
+    color: #504e70 !important;
+}
+.font-weight-semibold {
+    font-weight: 500 !important;
+}
+aside{
+    display: block;
+}
+.my-dash.app-sidebar .side-menu li a.active {
+    background: none;
+}
+
+.my-dash.app-sidebar .side-menu__item.active {
+    background: #f9faff !important;
+    color: #6963ff !important;
+    border-right: 2px solid #6963ff;
+}
+.my-dash .side-menu__icon {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    width: 25px;
+}
+.my-dash .side-menu__label {
+    white-space: nowrap;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+.my-dash .side-menu__item {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 14px;
+    -webkit-transition: border-left-color 0.3s ease, background-color 0.3s ease;
+    -o-transition: border-left-color 0.3s ease, background-color 0.3s ease;
+    transition: border-left-color 0.3s ease, background-color 0.3s ease;
+    border-top: 1px solid #e9ecf3;
+}
+.my-dash .slide {
+    list-style-type: none;
+}
+.my-dash li {
+    list-style-type: none;
+}
