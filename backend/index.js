@@ -1,28 +1,55 @@
 import express from 'express';
 import { config } from "dotenv";
 import cors from "cors";
+import { createServer } from 'http';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@as-integrations/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 
 import { router } from './routes/allRoute.js';
 import { connection } from './database.js';
+import { resolvers } from './graphql/resolvers.js';
 
 config();
-const app = express();
-const port = 5000;//process.env['PORT'];
-app.use(cors());
 
-connection.connect((err) => {
-    if (err) throw err;
-    console.log("connected")
-});
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const typeDefs = readFileSync(join(__dirname, 'graphql/schema.graphql'), 'utf-8');
 
-//Body Parser
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json())
+async function startServer() {
+    const app = express();
+    const port = process.env.PORT || 8000;
 
-// Routes
-app.use('/', router);
+    app.use(cors());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json());
 
-// Listening on the port
-app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
-});
+    connection.connect((err) => {
+        if (err) throw err;
+        console.log("connected");
+    });
+
+    const httpServer = createServer(app);
+
+    const apolloServer = new ApolloServer({
+        typeDefs,
+        resolvers,
+        plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    });
+
+    await apolloServer.start();
+
+    // Existing REST routes
+    app.use('/', router);
+
+    // GraphQL endpoint
+    app.use('/graphql', expressMiddleware(apolloServer));
+
+    await new Promise((resolve) => httpServer.listen({ port }, resolve));
+    console.log(`Server running on port ${port}`);
+    console.log(`GraphQL sandbox: http://localhost:${port}/graphql`);
+}
+
+startServer();

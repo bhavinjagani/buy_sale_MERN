@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import categoriesContext from "./categoriesContext";
 
 const GetCategories = (props) => {
-    const host = "http://localhost:5000"
+    const host = "http://localhost:8000"
     const noteintial = []
     const [categories, setcategories] = useState([])
     const [subcategories, setsubcategories] = useState([]);
