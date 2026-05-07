@@ -1,0 +1,147 @@
+type Category {
+  cat_id: Int
+  cat_name: String
+  cat_type: String
+  status: String
+  adscount: Int
+}
+
+type SubCategory {
+  sub_cat_id: Int
+  sub_cat_name: String
+  cat_id: Int
+  cat_name: String
+  status: String
+}
+
+type Ad {
+  ad_id: Int
+  user_id: Int
+  ad_type: String
+  ad_title: String
+  cat_id: Int
+  sub_cat_id: Int
+  brand_id: Int
+  make: String
+  price: Float
+  model: String
+  year: Int
+  fuel: String
+  km_driven: Int
+  version: String
+  color: String
+  owner: Int
+  insurance: String
+  furnished: String
+  rooms: String
+  squer_feet: Float
+  superbuiltup: Float
+  carpet: Float
+  bedroom: Int
+  bathroom: Int
+  maintanance: Float
+  parking: String
+  ad_description: String
+  ad_image: String
+  name: String
+  email: String
+  mobile: String
+  views: Int
+  country: String
+  state: String
+  city: String
+  item_condition: String
+  status: String
+  ubrowser: String
+  ipaddress: String
+  loc: String
+  org: String
+}
+
+type AdsCount {
+  all: Int
+  new: Int
+  old: Int
+}
+
+type AdsResponse {
+  ads: [Ad]
+  ads_count: AdsCount
+}
+
+type User {
+  user_id: Int
+  custname: String
+  username: String
+}
+
+type AuthResponse {
+  success: Boolean!
+  user: User
+  message: String
+}
+
+type AdResult {
+  success: Boolean!
+  insertId: Int
+  message: String
+}
+
+input AdInput {
+  userId: Int
+  adType: String
+  adTitle: String!
+  catId: Int!
+  subCatId: Int
+  brandId: Int
+  make: String
+  price: Float
+  model: String
+  year: Int
+  fuel: String
+  kmDriven: Int
+  version: String
+  color: String
+  owner: Int
+  insurance: String
+  furnished: String
+  rooms: String
+  squareFeet: Float
+  superBuiltup: Float
+  carpet: Float
+  bedroom: Int
+  bathroom: Int
+  maintenance: Float
+  parking: String
+  adDescription: String!
+  adImage: String
+  name: String!
+  email: String!
+  mobile: String!
+  views: Int
+  country: String!
+  state: String!
+  city: String!
+  itemCondition: String!
+  status: String
+  uBrowser: String
+  ipAddress: String
+  loc: String
+  org: String
+}
+
+type Query {
+  categories(type: String): [Category]
+  category(name: String!): Category
+  subCategories(type: String!, value: String!): [SubCategory]
+  latestAds: [Ad]
+  searchAllAds(category: String, itemCondition: String, start: Int, end: Int): AdsResponse
+  search(category: String, location: String, query: String, itemCondition: String, start: Int, end: Int): AdsResponse
+}
+
+type Mutation {
+  login(username: String!, password: String!): AuthResponse!
+  register(username: String!, name: String!, password: String!): AuthResponse!
+  createAd(input: AdInput!): AdResult!
+  updateAd(input: AdInput!): AdResult!
+}
