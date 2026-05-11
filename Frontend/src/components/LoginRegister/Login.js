@@ -7,29 +7,48 @@ import '../../styles/buttons.css'
 import Google from '../../Icons/Google';
 import Facebook from '../../Icons/Facebook';
 import Alert from '../Alert';
-export default function Login(props) {
-  const [cred, setCred] = useState("")
-  let navigate = useNavigate()
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    const response = await fetch(`http://localhost:5000/login`, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username: cred.username, password: cred.password }),
-    });
-   
-    if (response.status === 200) {
-      // save the token and redirect
-      const json = await response.json()
-      localStorage.setItem('token', json.username)
-      navigate("/")
-      props.showAlert("Sucessfull login", "success")
-      props.handlelogInlogOut(true)
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/authSlice';
+import { useMutation } from "@apollo/client/react";
+import { gql } from "@apollo/client";
+
+const LOGIN = gql`
+  mutation Login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      success
+      message
+      token
+      user {
+        user_id
+        custname
+        username
+      }
     }
-    else {
-      props.showAlert("Invlid Credatials", "danager")
+  }
+`;
+
+export default function Login(props) {
+  const dispatch = useDispatch();
+  const [loginMutation] = useMutation(LOGIN);
+  const [cred, setCred] = useState("");
+  let navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await loginMutation({
+        variables: { username: cred.username, password: cred.password },
+      });
+      if (data.login.success) {
+        dispatch(login({ user: data.login.user, token: data.login.token }));
+        navigate("/");
+        props.showAlert("Successful login", "success");
+        props.handlelogInlogOut(true);
+      } else {
+        props.showAlert(data.login.message, "danger");
+      }
+    } catch (err) {
+      props.showAlert("Something went wrong", "danger");
     }
   }
   const onChange = (e) => {
@@ -98,12 +117,12 @@ export default function Login(props) {
 
                           <label className="custom-control custom-checkbox"> <a href="<?php echo base_url(); ?>forgotpass" className="float-right small text-dark mt-1">I forgot password</a>
                             <div>
-                            <input type="checkbox" className="custom-control-input" />
+                              <input type="checkbox" className="custom-control-input" />
 
-                            <span className="custom-control-label text-dark">Remember me</span> 
+                              <span className="custom-control-label text-dark">Remember me</span>
                             </div>
-                            </label>
-                            
+                          </label>
+
                         </div>
 
                         <div className="form-footer mt-2">
@@ -112,8 +131,8 @@ export default function Login(props) {
 
                         </div>
 
-                       </form>
-                       <Alert alert={props.alert}></Alert>
+                      </form>
+                      <Alert alert={props.alert}></Alert>
                       <div className="text-center  mt-3 text-dark"> Don't have account yet? <Link to="/signup">SignUp</Link> </div>
 
                     </div>

@@ -9,6 +9,7 @@ export default function AdsLists() {
     subCategory = subCategory.replace("-"," ");
     const context = useContext(contextValue)
     const { Ads,search,mainCategories} = context;
+    const [adsList, setAdsList] = useState([]);
     let query ={
          category :"",
          itemCondition : null,
@@ -22,6 +23,14 @@ export default function AdsLists() {
         search(query)
         mainCategories()
     }, []);
+
+    useEffect(() => {
+        setAdsList(Ads.map((element) => ({
+            ...element,
+            ad_image: element.ad_image || "no_image.jpg",
+            ad_description: element.ad_description ? element.ad_description.slice(0, 80) + "..." : "",
+        })));
+    }, [Ads]);
     return (
         <>
         {/* Template AdsLists */}
@@ -75,9 +84,7 @@ export default function AdsLists() {
                                                     <div class="tab-pane active" id="tab2">
 
                                                         <div class="form row" id="allads">
-                                                        {Ads.map((element) => {
-                                                            element.ad_image = element.ad_image ?element.ad_image :"no_image.jpg";
-                                                            element.ad_description=element.ad_description ? element.ad_description.slice(0, 80)+"..." : ''
+                                                        {adsList.map((element) => {
                                                             return  <div class="card overflow-hidden search-list">
 
                                                                 <div class="d-md-flex">

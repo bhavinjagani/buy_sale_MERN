@@ -4,6 +4,7 @@ type Category {
   cat_type: String
   status: String
   adscount: Int
+  cat_img : String
 }
 
 type SubCategory {
@@ -12,6 +13,7 @@ type SubCategory {
   cat_id: Int
   cat_name: String
   status: String
+  sub_cat_img:String
 }
 
 type Ad {
@@ -23,7 +25,7 @@ type Ad {
   sub_cat_id: Int
   brand_id: Int
   make: String
-  price: Float
+  price: String
   model: String
   year: Int
   fuel: String
@@ -56,6 +58,7 @@ type Ad {
   ipaddress: String
   loc: String
   org: String
+  adcreated_date: String
 }
 
 type AdsCount {
@@ -79,6 +82,7 @@ type AuthResponse {
   success: Boolean!
   user: User
   message: String
+  token:String
 }
 
 type AdResult {
@@ -129,6 +133,9 @@ input AdInput {
   loc: String
   org: String
 }
+type location {
+  name:String!
+}
 
 type Query {
   categories(type: String): [Category]
@@ -137,6 +144,8 @@ type Query {
   latestAds: [Ad]
   searchAllAds(category: String, itemCondition: String, start: Int, end: Int): AdsResponse
   search(category: String, location: String, query: String, itemCondition: String, start: Int, end: Int): AdsResponse
+  getAdById(id:Int) : [Ad]
+  getLocations(country: Int, state: Int): [location]
 }
 
 type Mutation {

@@ -10,12 +10,12 @@ const getCategoriesByType = async (type = null) => {
         categoryQuery = `SELECT c.*, COUNT(p.cat_id) AS adscount 
 FROM category AS c 
 LEFT JOIN ads AS p ON (c.cat_id = p.cat_id AND p.status = 'Active') 
-WHERE c.status = 'Active' 
+WHERE c.status = 'Active'  
 GROUP BY c.cat_id 
 ORDER BY c.cat_id;
 `;
     }
-    console.log(categoryQuery);
+    console.log("this are the category",categoryQuery);
     let categoryResponse = await new Promise((resolve, reject) => {
         connection.query(categoryQuery, (err, results) => {
             if (err) return reject(err);
@@ -192,5 +192,37 @@ const getLatestAds = async () => {
     return latestAdsResponse;
 };
 
+const getAdById = async (id) =>{
+    let query = `SELECT * FROM ads WHERE ad_id = ${connection.escape(id)} LIMIT 1`;
+    let response = await new Promise((resolve,reject)=>{
+        connection.query(query,(err,results)=>{
+            if(err) return reject(err);
+            return resolve(results)
+        })
+    })
+    console.log("this is response",response)
+    return response ?? null
+}
+const getLocations = async (country = null, state = null) => {
+    let query = `SELECT name FROM location_states`;
+    const params = [];
 
-export { getCategoriesByType, getCategoryByName, getSubCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds };
+    if (country && state) {
+        query += ` WHERE country_id = ? AND state_id = ?`;
+        params.push(parseInt(country), parseInt(state));
+    } else if (country) {
+        query += ` WHERE country_id = ?`;
+        params.push(parseInt(country));
+    }
+    console.log("this is query for location",query)
+
+    let response = await new Promise((resolve, reject) => {
+        connection.query(query, params, (err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+        });
+    });
+    return response ?? null;
+}
+
+export { getCategoriesByType, getCategoryByName, getSubCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById ,getLocations};

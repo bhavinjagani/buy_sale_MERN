@@ -51,7 +51,7 @@ const App =()=>  {
            <Route exact path="login" element={<Login showAlert={showAlert} alert={alert} isLoggedIn={isLoggedIn} handlelogInlogOut={handlelogInlogOut}/>} />
            <Route  path="ads/category/:name" element={<AdsSubCategories />} />
            <Route  path="ads/category/:name/:subCategory" element={<AdsLists />} />
-           <Route  path="searchdata/:searchquery" element={<SearchResult />} />
+           <Route path="searchdata" element={<SearchResult />} />
            <Route  exact path="ads/view/:ad_id" element={<AdsDescription />} />
            
            <Route element={<Protected />}>

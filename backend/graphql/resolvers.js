@@ -1,13 +1,16 @@
-import { getCategoriesByType, getCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds } from '../models/adsModel.js';
+import { getCategoriesByType, getCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById,getLocations } from '../models/adsModel.js';
 import { loginValidate, addUser } from '../models/userModel.js';
 import { searchallAds, search } from '../models/searchModel.js';
+import { signToken } from '../utils/jwt.js';
 
 export const resolvers = {
     Query: {
         categories: async (_, { type }) => {
             return await getCategoriesByType(type ?? null);
         },
-
+        getLocations : async (_,{country,state}) =>{
+              return await getLocations(country,state);
+        },
         category: async (_, { name }) => {
             const results = await getCategoryByName(name);
             return results[0] ?? null;
@@ -24,6 +27,10 @@ export const resolvers = {
         searchAllAds: async (_, { category, itemCondition, start, end }) => {
             return await searchallAds(category ?? null, itemCondition ?? null, start ?? 0, end ?? 30);
         },
+        getAdById : async(_,{id})=>{
+            console.log("we are right here",id)
+              return await getAdById(id)
+        },
 
         search: async (_, { category, location, query, itemCondition, start, end }) => {
             return await search(
@@ -39,11 +46,16 @@ export const resolvers = {
 
     Mutation: {
         login: async (_, { username, password }) => {
+                            console.log("okay this is user",username)
+
             const results = await loginValidate(username, password);
             if (results.length > 0) {
-                return { success: true, user: results[0], message: 'Login successful' };
+                const user = results[0];
+                console.log("okay this is user",user)
+                const token = signToken(user);
+                return { success: true, user: user,token, message: 'Login successful' };
             }
-            return { success: false, user: null, message: 'Invalid username or password' };
+            return { success: false, user: null,token:null, message: 'Invalid username or password' };
         },
 
         register: async (_, { username, name, password }) => {
@@ -54,12 +66,14 @@ export const resolvers = {
             return { success: false, message: 'Username already exists' };
         },
 
-        createAd: async (_, { input }) => {
+        createAd: async (_, { input }, { user }) => {
+            if (!user) throw new Error('Not authenticated');
             const result = await createOneAd(input);
             return { success: true, insertId: result.insertId, message: 'Ad created successfully' };
         },
 
-        updateAd: async (_, { input }) => {
+        updateAd: async (_, { input }, { user }) => {
+            if (!user) throw new Error('Not authenticated');
             await updateOneAd(input);
             return { success: true, message: 'Ad updated successfully' };
         },

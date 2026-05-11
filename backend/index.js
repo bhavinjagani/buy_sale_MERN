@@ -12,6 +12,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { router } from './routes/allRoute.js';
 import { connection } from './database.js';
 import { resolvers } from './graphql/resolvers.js';
+import { getUser } from './middleware/auth.js';
 
 config();
 
@@ -45,7 +46,9 @@ async function startServer() {
     app.use('/', router);
 
     // GraphQL endpoint
-    app.use('/graphql', expressMiddleware(apolloServer));
+    app.use('/graphql', expressMiddleware(apolloServer, {
+        context: async ({ req }) => ({ user: getUser(req) }),
+    }));
 
     await new Promise((resolve) => httpServer.listen({ port }, resolve));
     console.log(`Server running on port ${port}`);
