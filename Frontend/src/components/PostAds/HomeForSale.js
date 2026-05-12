@@ -43,7 +43,7 @@ export default function HomeForSale() {
 
 
         <form class="form-horizontal" enctype="multipart/form-data" method="post" name="frm"
-          onsubmit="return chakval(frm);" action="<?php echo base_url(); ?>ads/createad">
+          onsubmit="" action="">
 
 
 

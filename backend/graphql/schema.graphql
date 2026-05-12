@@ -76,6 +76,8 @@ type User {
   user_id: Int
   custname: String
   username: String
+  opid:Int
+
 }
 
 type AuthResponse {

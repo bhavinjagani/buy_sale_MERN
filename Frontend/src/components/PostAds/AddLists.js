@@ -91,9 +91,7 @@ export default function AddLists() {
 
                                                         </div>
                                                     </Link>
-                                                </div>
-
-                                            
+                                                </div>                                            
 
                                         </div>
 

@@ -95,7 +95,7 @@ export default function AdsLists() {
 
                                                                         <div class="item-card9-imgs"> <a href={`/ads/view/${element.ad_id}`}>
                                                             
-                                                                            <img src={`/Images/uploads/${element.ad_image.split(",")[0]}`  }/>
+                                                                            <img src={`http://localhost:8000/Images/uploads/${element.ad_image.split(",")[0]}`} /> 
                                                                             </a>
                                                                         </div>
 

@@ -5,7 +5,7 @@ import {
   } from "react-router-dom";
 export default function AdsItem(props) {
     let {cat_name,imgurl,cat_url}=props;
-    const imageUrl = `/Images/category/${imgurl}`;
+    const imageUrl = `http://localhost:8000/Images/category/${imgurl}`;
     return (
         <>
             <div className="card overflow-hidden">

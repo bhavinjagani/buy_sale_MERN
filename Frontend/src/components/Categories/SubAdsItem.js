@@ -5,7 +5,7 @@ import {
   } from "react-router-dom";
 export default function SubAdsItem(props) {
     let {cat_name,imgurl,cat_url,sub_cat_id}=props;
-    const imageUrl = `/Images/subcategory/${imgurl}`;
+    const imageUrl = `http://localhost:8000/Images/subcategory/${imgurl}`;
     cat_url = "/"+cat_url;
   return (
     // SubAdsItem

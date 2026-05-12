@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-
+public/
 # Environment variables
 .env
 .env.local

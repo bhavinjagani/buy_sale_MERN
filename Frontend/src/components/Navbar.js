@@ -1,33 +1,33 @@
 import React, { useState } from 'react'
-import {
-  Link, useLocation
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 import logoImg from '../img/bnslogo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt, faUser, faHouseChimney, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../store/authSlice';
 import '../styles/Navbar.css'
-const Navbar = (props) => {
+
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-  let navigate = useNavigate()
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const dispatch = useDispatch();
+  let navigate = useNavigate();
+
+  const toggleDropdown = () => setIsOpen(!isOpen);
+
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    props.handlelogInlogOut(false)
-    navigate("/")
-  }
-  
+    dispatch(logout());
+    navigate("/");
+  };
+
   const postFreeAd = () => {
-    
-    if (props.isLoggedIn) {
-      navigate("/postads")
+    if (isLoggedIn) {
+      navigate("/postads");
+    } else {
+      navigate("/login");
     }
-    else {
-      navigate("/login")
-    }
-  }
+  };
   return (
     <>
       <nav className="navbar  navbar-expand-lg header">
@@ -38,7 +38,7 @@ const Navbar = (props) => {
             </div>
           </div>
           <div className='d-flex w-1/3 justify-center'>
-            {!props.isLoggedIn ? <form className="d-flex" role="search">
+            {!isLoggedIn ? <form className="d-flex" role="search">
               <Link to="login" className="btn-login"><FontAwesomeIcon icon={faSignInAlt} style={{ color: "#000000", marginRight: "0.25rem" }} /><span>Login</span></Link>
               <Link to="signup" className='btn-login'><FontAwesomeIcon icon={faUser} style={{ color: "#000000", marginRight: "0.25rem" }} /> <span>Register</span> </Link></form> :
               <form>

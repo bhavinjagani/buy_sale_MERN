@@ -46,12 +46,10 @@ export const resolvers = {
 
     Mutation: {
         login: async (_, { username, password }) => {
-                            console.log("okay this is user",username)
 
             const results = await loginValidate(username, password);
             if (results.length > 0) {
                 const user = results[0];
-                console.log("okay this is user",user)
                 const token = signToken(user);
                 return { success: true, user: user,token, message: 'Login successful' };
             }
@@ -67,6 +65,7 @@ export const resolvers = {
         },
 
         createAd: async (_, { input }, { user }) => {
+            console.log("this is user ",user)
             if (!user) throw new Error('Not authenticated');
             const result = await createOneAd(input);
             return { success: true, insertId: result.insertId, message: 'Ad created successfully' };

@@ -22,6 +22,7 @@ const LOGIN = gql`
         user_id
         custname
         username
+        opid
       }
     }
   }
@@ -43,7 +44,6 @@ export default function Login(props) {
         dispatch(login({ user: data.login.user, token: data.login.token }));
         navigate("/");
         props.showAlert("Successful login", "success");
-        props.handlelogInlogOut(true);
       } else {
         props.showAlert(data.login.message, "danger");
       }

@@ -26,6 +26,7 @@ async function startServer() {
     app.use(cors());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
+    app.use(express.static('public'));
 
     connection.connect((err) => {
         if (err) throw err;
