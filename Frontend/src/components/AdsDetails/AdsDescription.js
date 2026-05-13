@@ -178,7 +178,7 @@ export default function AdsDescription() {
                             <div className="card-body">
                                 <h3 className="font-weight-semibold mb-2">{ad.ad_title}</h3>
                                 <h2 className="text-primary font-weight-bold mb-1">
-                                    &#8377; {Number(ad.price).toLocaleString('en-IN')}
+                                   $ {Number(ad.price).toLocaleString('en-IN')}
                                 </h2>
                                 <hr />
                                 <ul className="list-unstyled mb-0">

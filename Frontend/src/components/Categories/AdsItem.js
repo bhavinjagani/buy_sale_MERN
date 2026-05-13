@@ -1,34 +1,22 @@
-import React from 'react'
-import {
-    Link,
-    useNavigate
-  } from "react-router-dom";
-export default function AdsItem(props) {
-    let {cat_name,imgurl,cat_url}=props;
+import { Link } from 'react-router-dom';
+
+export default function AdsItem({ cat_name, imgurl, cat_url, adscount }) {
     const imageUrl = `http://localhost:8000/Images/category/${imgurl}`;
     return (
-        <>
-            <div className="card overflow-hidden">
-            <div className="card-body text-center">
-
-                <Link to={cat_url}>
-
-                    <img src={imageUrl}  className="w-9 hh-8" /> 
-                </Link>
-
-                <div className="item-card7-desc">
-
-                    <div className="item-card7-text mt-3"> <Link to={cat_url} className="text-dark">
-
-                        <h4 className="mb-1"> {cat_name} </h4>
-
-                    </Link> </div>
-
-                </div>
-
+        <Link to={cat_url} className="category-card" style={{ textDecoration: 'none' }}>
+            <div className="category-card-img-wrap">
+                <img
+                    src={imageUrl}
+                    alt={cat_name}
+                    onError={(e) => { e.target.src = '/images/no_image.jpg'; }}
+                />
             </div>
+            <div className="category-card-body">
+                <div className="category-card-name">{cat_name}</div>
+                {adscount !== undefined && (
+                    <span className="category-ads-badge">{adscount} Ads</span>
+                )}
             </div>
-        </>
-    )
+        </Link>
+    );
 }
-

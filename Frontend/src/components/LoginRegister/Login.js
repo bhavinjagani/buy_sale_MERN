@@ -23,6 +23,12 @@ const LOGIN = gql`
         custname
         username
         opid
+        weblink
+        state
+        custimg
+        custaddress
+        aboutme
+        custemail
       }
     }
   }

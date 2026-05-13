@@ -50,5 +50,44 @@ const addUser = async (username, name, password) => {
 
 }
 
-export { getUser, loginValidate, addUser };
+const getUserById = (userId) => {
+    return new Promise((resolve, reject) => {
+        connection.query(`SELECT * FROM users WHERE user_id = ?`, [userId], (err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+        });
+    });
+};
+
+const updateUserProfile = (userId, data) => {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `UPDATE users SET custname=?, custphone=?, custaddress=?, aboutme=?, weblink=?, fblink=?, instalink=?, googlelink=?, twitterlink=?, youtubelink=? WHERE user_id=?`,
+            [data.custname, data.custphone, data.custaddress, data.aboutme, data.weblink, data.fblink, data.instalink, data.googlelink, data.twitterlink, data.youtubelink, userId],
+            (err, result) => {
+                if (err) return reject(err);
+                return resolve(result);
+            }
+        );
+    });
+};
+
+const changeUserPassword = (userId, currentPassword, newPassword) => {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `SELECT user_id FROM users WHERE user_id=? AND password=?`,
+            [userId, currentPassword],
+            (err, results) => {
+                if (err) return reject(err);
+                if (results.length === 0) return resolve({ success: false, message: 'Current password is incorrect' });
+                connection.query(`UPDATE users SET password=? WHERE user_id=?`, [newPassword, userId], (err2) => {
+                    if (err2) return reject(err2);
+                    return resolve({ success: true, message: 'Password changed successfully' });
+                });
+            }
+        );
+    });
+};
+
+export { getUser, loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword };
 

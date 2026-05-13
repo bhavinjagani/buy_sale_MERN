@@ -22,6 +22,7 @@ type Ad {
   ad_type: String
   ad_title: String
   cat_id: Int
+  cat_name: String
   sub_cat_id: Int
   brand_id: Int
   make: String
@@ -76,8 +77,32 @@ type User {
   user_id: Int
   custname: String
   username: String
-  opid:Int
+  opid: Int
+  custphone: String
+  custaddress: String
+  custimg: String
+  aboutme: String
+  custemail: String
+  weblink: String
+  fblink: String
+  instalink: String
+  googlelink: String
+  twitterlink: String
+  youtubelink: String
+  state: String
+}
 
+input UserProfileInput {
+  custname: String
+  custphone: String
+  custaddress: String
+  aboutme: String
+  weblink: String
+  fblink: String
+  instalink: String
+  googlelink: String
+  twitterlink: String
+  youtubelink: String
 }
 
 type AuthResponse {
@@ -146,8 +171,9 @@ type Query {
   latestAds: [Ad]
   searchAllAds(category: String, itemCondition: String, start: Int, end: Int): AdsResponse
   search(category: String, location: String, query: String, itemCondition: String, start: Int, end: Int): AdsResponse
-  getAdById(id:Int) : [Ad]
+  getAdById(id: Int): [Ad]
   getLocations(country: Int, state: Int): [location]
+  getUserAds(userId: Int!): [Ad]
 }
 
 type Mutation {
@@ -155,4 +181,6 @@ type Mutation {
   register(username: String!, name: String!, password: String!): AuthResponse!
   createAd(input: AdInput!): AdResult!
   updateAd(input: AdInput!): AdResult!
+  updateUserProfile(input: UserProfileInput!): AuthResponse!
+  changePassword(currentPassword: String!, newPassword: String!): AuthResponse!
 }

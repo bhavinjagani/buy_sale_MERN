@@ -71,58 +71,70 @@ const getSubCategoriesByNameorID = async (type, value) => {
     return subcategoryResponse;
 };
 
-const createOneAd = async (adData) => {
+// Maps GraphQL/JS field names → DB column names
+const AD_FIELD_MAP = {
+    userId:        'user_id',
+    adType:        'ad_type',
+    adTitle:       'ad_title',
+    catId:         'cat_id',
+    subCatId:      'sub_cat_id',
+    brandId:       'brand_id',
+    make:          'make',
+    price:         'price',
+    model:         'model',
+    year:          'year',
+    fuel:          'fuel',
+    kmDriven:      'km_driven',
+    version:       'version',
+    color:         'color',
+    owner:         'owner',
+    insurance:     'insurance',
+    furnished:     'furnished',
+    rooms:         'rooms',
+    squareFeet:    'squer_feet',
+    superBuiltup:  'superbuiltup',
+    carpet:        'carpet',
+    bedroom:       'bedroom',
+    bathroom:      'bathroom',
+    maintenance:   'maintanance',
+    parking:       'parking',
+    adDescription: 'ad_description',
+    adImage:       'ad_image',
+    name:          'name',
+    email:         'email',
+    mobile:        'mobile',
+    views:         'views',
+    country:       'country',
+    state:         'state',
+    city:          'city',
+    itemCondition: 'item_condition',
+    status:        'status',
+    uBrowser:      'ubrowser',
+    ipAddress:     'ipaddress',
+    loc:           'loc',
+    org:           'org',
+};
 
-    let adDataQuery = `insert into ads set 
-    user_id = '${adData.userId}', 
-    ad_type = '${adData.adType}', 
-    ad_title = '${adData.adTitle}', 
-    cat_id = '${adData.catId}',
-    sub_cat_id = '${adData.subCatId}',
-    brand_id = '${adData.brandId ?? null}',
-    make = '${adData.make ?? null}',
-    price = '${adData.price ?? null}',
-    model = '${adData.model ?? null}',
-    year = '${adData.year ?? null}',
-    fuel = '${adData.fuel ?? null}',
-    km_driven = '${adData.kmDriven ?? null}',
-    version = '${adData.version ?? null}',
-    color = '${adData.color ?? null}',
-    owner = ${adData.owner ?? null},
-    insurance = '${adData.insurance ?? null}',
-    furnished = '${adData.furnished ?? null}',
-    rooms = '${adData.rooms ?? null}',
-    squer_feet = '${adData.squareFeet ?? null}',
-    superbuiltup = '${adData.superBuiltup ?? null}',
-    carpet = '${adData.carpet ?? null}',
-    bedroom = ${adData.bedroom ?? null},
-    bathroom = ${adData.bathroom?? null},
-    maintanance = ${adData.maintenance?? null},
-    parking = '${adData.parking ?? null}',
-    ad_description = '${adData.adDescription}',
-    ad_image = '${adData.adImage}',
-    name = '${adData.name}',
-    email = '${adData.email}',
-    mobile = '${adData.mobile}',
-    views = ${adData.views ?? null},
-    country = '${adData.country}',
-    state = '${adData.state}',
-    city = '${adData.city}',
-    item_condition = '${adData.itemCondition}',
-    status = '${adData.status ?? null}',
-    ubrowser = '${adData.uBrowser}',
-    ipaddress = '${adData.ipAddress}',
-    loc = '${adData.loc ?? null}',
-    org = '${adData.org ?? null}'
-    `
-   
-    let createAdResponse = await new Promise((resolve, reject) => {
-        connection.query(adDataQuery, (err, results) => {
+const createOneAd = async (adData) => {
+    const setClauses = [];
+    const values = [];
+
+    for (const [jsKey, dbCol] of Object.entries(AD_FIELD_MAP)) {
+        const val = adData[jsKey];
+        if (val !== undefined && val !== null && val !== '') {
+            setClauses.push(`${dbCol} = ?`);
+            values.push(val);
+        }
+    }
+
+    const query = `INSERT INTO ads SET ${setClauses.join(', ')}`;
+
+    return new Promise((resolve, reject) => {
+        connection.query(query, values, (err, results) => {
             if (err) return reject(err);
             return resolve(results);
         });
     });
-    return createAdResponse;
 }
 
 const updateOneAd = async (adData) => {
@@ -225,4 +237,21 @@ const getLocations = async (country = null, state = null) => {
     return response ?? null;
 }
 
-export { getCategoriesByType, getCategoryByName, getSubCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById ,getLocations};
+const getAdsByUser = (userId) => {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `SELECT ads.*, category.cat_name
+             FROM ads
+             LEFT JOIN category ON ads.cat_id = category.cat_id
+             WHERE ads.user_id = ?
+             ORDER BY ads.adcreated_date DESC`,
+            [userId],
+            (err, results) => {
+                if (err) return reject(err);
+                return resolve(results);
+            }
+        );
+    });
+};
+
+export { getCategoriesByType, getCategoryByName, getSubCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser };

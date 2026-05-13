@@ -18,7 +18,7 @@ export default function Item() {
         price:         '',
         itemCondition: 'OLD Item',
         description:   '',
-        country:       'India',
+        country:       'United State',
         state:         '',
         city:          '',
         images:        [],   // array of File objects

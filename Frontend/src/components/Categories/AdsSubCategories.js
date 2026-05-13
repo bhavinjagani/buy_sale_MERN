@@ -34,7 +34,6 @@ export default function AdsSubCategories(props) {
             <div className='col-xl-9 col-lg-8 col-md-12 card'>
               <div className="card-header">
 
-                <div className="image"> <img src={Ads.imgUrl} class="img-responsive" alt="img" style={{maxHeight:"100px"}}/></div>
 
                 <div className="col-xs-12 col-sm-7">
 
@@ -42,7 +41,6 @@ export default function AdsSubCategories(props) {
 
                   {Ads.adsCount} ads
 
-                   <a href="<?php echo base_url(); ?>searchdata/bycategory/<?php echo str_replace(' ', '-', @$categoryname); ?>">View All Ads</a>
 
                 </div>
 
