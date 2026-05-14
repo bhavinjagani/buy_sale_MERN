@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import { login } from '../../store/authSlice';
 import { useMutation } from "@apollo/client/react";
 import { gql } from "@apollo/client";
+import { GoogleLogin } from '@react-oauth/google';
 
 const LOGIN = gql`
   mutation Login($username: String!, $password: String!) {
@@ -33,10 +34,28 @@ const LOGIN = gql`
     }
   }
 `;
+const GOOGLE_LOGIN = gql`
+  mutation GoogleLogin($tokenId:String!){
+     googleLogin(tokenId : $tokenId){
+     token
+     user {  user_id
+        custname
+        username
+        opid
+        weblink
+        state
+        custimg
+        custaddress
+        aboutme
+        custemail}
+     }
+  }
+`;
 
 export default function Login(props) {
   const dispatch = useDispatch();
   const [loginMutation] = useMutation(LOGIN);
+  const [googleloginmutation] = useMutation(GOOGLE_LOGIN)
   const [cred, setCred] = useState("");
   let navigate = useNavigate();
 
@@ -56,6 +75,13 @@ export default function Login(props) {
     } catch (err) {
       props.showAlert("Something went wrong", "danger");
     }
+  }
+  const handleGoogleSuccess = async (credentialResponse) => {
+    const { data } = await googleloginmutation({
+      variables: { tokenId: credentialResponse.credential },
+    })
+    dispatch(login({ token: data.googleLogin.token, user: data.googleLogin.user }));
+    navigate('/');
   }
   const onChange = (e) => {
 
@@ -88,9 +114,11 @@ export default function Login(props) {
                     <div className="card-body">
 
                       <div className="text-center">
-                        <div className="btn-group btn-block mt-2 mb-2"> <a href="<?php echo base_url(); ?>user_authentication" className="btn btn-facebook active"><Facebook className={"icon-facebook"} width={'24px'} height={"1em"} /> </a> <a href="<?php echo base_url(); ?>user_authentication" className="btn btn-block btn-facebook">Facebook</a> </div>
 
-                        <div className="btn-group btn-block mt-2 mb-2"> <a href="https://www.google.com/gmail/" className="btn btn-google active"><Google className={"icon-facebook"} width={'24px'} height={"1em"} /> </a> <a href="https://www.google.com/gmail/" className="btn btn-block btn-google">Google</a> </div>
+                        <GoogleLogin
+                          onSuccess={handleGoogleSuccess}
+                          onError={() => console.log('Google login failed')}
+                        />
 
                       </div>
 

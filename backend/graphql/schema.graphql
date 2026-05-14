@@ -183,4 +183,6 @@ type Mutation {
   updateAd(input: AdInput!): AdResult!
   updateUserProfile(input: UserProfileInput!): AuthResponse!
   changePassword(currentPassword: String!, newPassword: String!): AuthResponse!
+  googleLogin(tokenId: String!): AuthResponse
+
 }

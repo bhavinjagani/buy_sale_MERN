@@ -89,5 +89,32 @@ const changeUserPassword = (userId, currentPassword, newPassword) => {
     });
 };
 
-export { getUser, loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword };
+const findOrCreateGoogleUser = (googleId, email, name) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT * FROM users WHERE google_id = ? OR custemail = ?`,
+      [googleId, email],
+      (err, results) => {
+        if (err) return reject(err);
+        if (results.length > 0) {
+          const user = results[0];
+          if (!user.google_id) {
+            connection.query(`UPDATE users SET google_id = ? WHERE opid = ?`, [googleId, user.opid]);
+          }
+          return resolve(user);
+        }
+        // New user — create them
+        connection.query(
+          `INSERT INTO users (custname,username, custemail, google_id) VALUES (?, ?, ?, ?)`,
+          [name,name, email, googleId],
+          (err2, result) => {
+            if (err2) return reject(err2);
+            resolve({ id: result.insertId, username: name, email });
+          }
+        );
+      }
+    );
+  });
+};
+export { getUser, loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword,findOrCreateGoogleUser };
 

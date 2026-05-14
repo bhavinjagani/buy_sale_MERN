@@ -8,15 +8,19 @@ import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import client from './apolloClient';
 import { store } from './store/store';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+console.log("this is oauth client token",process.env.REACT_APP_GOOGLE_CLIENT_ID)
 root.render(
   <React.StrictMode>
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
     <Provider store={store}>
       <ApolloProvider client={client}>
         <App />
       </ApolloProvider>
     </Provider>
+     </GoogleOAuthProvider>
   </React.StrictMode>
 );
 

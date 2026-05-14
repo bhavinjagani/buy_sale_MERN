@@ -1,7 +1,10 @@
 import { getCategoriesByType, getCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser } from '../models/adsModel.js';
-import { loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword } from '../models/userModel.js';
+import { loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword ,findOrCreateGoogleUser} from '../models/userModel.js';
 import { searchallAds, search } from '../models/searchModel.js';
 import { signToken } from '../utils/jwt.js';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 export const resolvers = {
     Query: {
@@ -86,5 +89,16 @@ export const resolvers = {
             const result = await changeUserPassword(user.user_id, currentPassword, newPassword);
             return result;
         },
+        googleLogin : async (_,{tokenId})=> {
+            const ticket = await googleClient.verifyIdToken({
+                idToken : tokenId,
+                audience : process.env.GOOGLE_CLIENT_ID
+            });
+            const {sub:googleId,email,name} = ticket.getPayload();
+            console.log("this is token for authentication",email,name)
+            const user = await findOrCreateGoogleUser(googleId,email,name)
+            const token = signToken(user);
+            return { success: true, user: user, token, message: 'Login successful' };
+        }
     },
 };
