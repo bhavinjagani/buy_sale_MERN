@@ -1,364 +1,235 @@
-import React from 'react'
+import { useState, useContext } from 'react'
+import { useMutation } from "@apollo/client/react";
+import { usePostAdsContext } from './index';
+import contextValue from '../../context/categories/categoriesContext';
+import { CREATE_AD } from './mutations';
 
 export default function Services() {
-  return (
-    <>
-      <section class="sptb">
-
-        <div class="container">
-
-          <div class="row ">
-
-            <div class="col-lg-8 col-md-12 col-md-12">
-
-              <div class="card mb-lg-0">
-
-                <div class="card-header ">
-
-                  <h3 class="card-title">List Your Service Classifieds </h3>
-
-                </div>
-
-
-                <div class="alert alert-warning">
-
-                  <i class="icon-warning"></i> You have selected Invalid File type ! Allowd file type : JPEG,JPG,GIF,PNG
-
-                </div>
-
-
-
-
-
-                <div class="alert alert-info">
-
-                  You have Already created ads with this title your ads is pending wait 24 hour your ads will be live in 24 hour.
-
-                </div>
-
-
-                <form class="form-horizontal" enctype="multipart/form-data" method="post" name="frm" onsubmit="return chakval(frm);" action="<?php echo base_url(); ?>ads/createad">
-
-                  <div class="card-body">
-
-                    <div class="form-group">
-
-                      <label class="form-label text-dark">Ad Title</label>
-
-                      <input type="text" class="form-control" id="txtadtitle" name="txtadtitle" required placeholder="Ad title"/>
-
-                    </div>
-
-                    <div class="row">
-
-
-
-                      <div class="form-group col-sm-4 col-md-4">
-
-                        <label class="form-label text-dark">Category</label>
-
-                        <select name="txtcategory" id="txtcategory" required class="category form-control custom-select1">
-
-                          <option value="" selected="selected"> Select a category...</option>
-
-                          <option value="">  </option>
-
-                        </select>
-
-                      </div>
-
-                      <div class="form-group col-sm-4 col-md-4">
-
-                        <label class="form-label text-dark">Sub Category</label>
-
-                        <select name="txtsub_category" id="txtsub_category" required class="subcategory form-control custom-select1" >
-
-                          <option value="" selected="selected"> Select Subcategory...</option>
-
-                        </select>
-
-                      </div>
-
-
-
-                      <div class="form-group col-sm-4 col-md-4">
-
-                        <label class="form-label text-dark">Service Fees</label>
-
-                        <input type="text" class="form-control" id="txtprice" required name="txtprice" placeholder="Service Fees"/>
-
-                      </div>
-
-                    </div>
-
-
-
-
-
-
-
-                    <div class="form-group">
-
-                      <label class="form-label text-dark">Description</label>
-
-                      <textarea class="form-control" name="ad_desc" id="ad_desc" rows="6" placeholder="text here.." required></textarea>
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                      <div class="custom-file">
-
-
-
-
-
-                        <center>
-                          <p class="help-block">Allowd file type : JPEG,JPG,GIF,PNG</p>
-                        </center>
-
-                        <div class="form-group">
-
-                          <label class="col-md-3 control-label" for="textarea"> Picture <suv>*</suv></label>
-
-                          <div class="col-md-8">
-
-                            <div class="mb10">
-
-                              <input id="input-upload-img1" placeholder="Main Image" required name="txtimage1" type="file" class="file" data-preview-file-type="text"/>
+    const { user, categories } = usePostAdsContext();
+    const { subcategories, getSubCategories } = useContext(contextValue);
+    const [createAd, { loading }] = useMutation(CREATE_AD);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
+    const [formData, setFormData] = useState({
+        adTitle:     '',
+        category:    '',
+        subCategory: '',
+        price:       '',
+        description: '',
+        country:     'India',
+        state:       '',
+        city:        '',
+        images:      [],
+    });
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleImageChange = (e) => {
+        const files = Array.from(e.target.files);
+        setFormData((prev) => ({ ...prev, images: [...prev.images, ...files] }));
+    };
+
+    const handleCatChange = (e) => {
+        const selected = e.target.value;
+        setFormData({ ...formData, category: selected, subCategory: '' });
+        if (selected) getSubCategories(selected);
+    };
+
+    const postAd = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+        try {
+            let adImage = '';
+            if (formData.images.length > 0) {
+                const imageForm = new FormData();
+                formData.images.forEach(file => imageForm.append('images', file));
+                const uploadRes = await fetch('http://localhost:8000/upload', {
+                    method: 'POST',
+                    headers: { authorization: `Bearer ${localStorage.getItem('token')}` },
+                    body: imageForm,
+                });
+                const uploadData = await uploadRes.json();
+                adImage = uploadData.filenames;
+            }
+
+            const catObj = categories.find(c => c.cat_name === formData.category);
+
+            const { data } = await createAd({
+                variables: {
+                    input: {
+                        userId:        user?.opid,
+                        adType:        'service',
+                        adTitle:       formData.adTitle,
+                        catId:         catObj?.cat_id ?? 0,
+                        subCatId:      parseInt(formData.subCategory) || null,
+                        price:         parseFloat(formData.price) || 0,
+                        itemCondition: 'NEW Item',
+                        adDescription: formData.description,
+                        adImage,
+                        name:          user?.custname ?? '',
+                        email:         user?.username ?? '',
+                        mobile:        '',
+                        country:       formData.country,
+                        state:         formData.state,
+                        city:          formData.city,
+                        status:        'Active',
+                        uBrowser:      navigator.userAgent,
+                    }
+                }
+            });
+
+            if (data.createAd.success) {
+                setSuccess('Service ad posted successfully!');
+                setFormData({
+                    adTitle: '', category: '', subCategory: '', price: '',
+                    description: '', country: 'India', state: '', city: '', images: [],
+                });
+            } else {
+                setError(data.createAd.message);
+            }
+        } catch (err) {
+            setError('Failed to post ad. Please try again.');
+        }
+    };
+
+    return (
+        <>
+            <section className="sptb">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-8 col-md-12">
+                            <div className="card mb-lg-0">
+                                <div className="card-header">
+                                    <h3 className="card-title">List Your Service Classifieds</h3>
+                                </div>
+
+                                <form className="form-horizontal" onSubmit={postAd}>
+                                    <div className="card-body">
+
+                                        <div className="form-group">
+                                            <label className="form-label text-dark">Ad Title*</label>
+                                            <input type="text" className="form-control" name="adTitle" value={formData.adTitle} onChange={handleChange} placeholder="Ad title" required />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group col-sm-4 col-md-4">
+                                                <label className="form-label text-dark">Category*</label>
+                                                <select className="form-control" name="category" value={formData.category} onChange={handleCatChange} required>
+                                                    <option value="">Select a category...</option>
+                                                    {categories.map((c) => (
+                                                        <option key={c.cat_id} value={c.cat_name}>{c.cat_name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="form-group col-sm-4 col-md-4">
+                                                <label className="form-label text-dark">Sub Category*</label>
+                                                <select className="form-control" name="subCategory" value={formData.subCategory} onChange={handleChange} required>
+                                                    <option value="">Select Subcategory...</option>
+                                                    {subcategories.map((s) => (
+                                                        <option key={s.sub_cat_id} value={s.sub_cat_id}>{s.sub_cat_name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="form-group col-sm-4 col-md-4">
+                                                <label className="form-label text-dark">Service Fees*</label>
+                                                <input type="number" className="form-control" name="price" value={formData.price} onChange={handleChange} placeholder="Service Fees" required />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label text-dark">Description*</label>
+                                            <textarea className="form-control" name="description" value={formData.description} onChange={handleChange} rows="6" placeholder="Describe your service..." required></textarea>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <div className="custom-file">
+                                                <center>
+                                                    <p className="help-block">Allowed file type: JPEG, JPG, GIF, PNG</p>
+                                                </center>
+                                                <div className="form-group">
+                                                    <label className="col-md-3 control-label">Pictures</label>
+                                                    <div className="col-md-8">
+                                                        {[1,2,3,4,5,6].map(n => (
+                                                            <div className="mb10" key={n}>
+                                                                <input type="file" className="file" accept="image/jpeg,image/jpg,image/gif,image/png" onChange={handleImageChange} />
+                                                            </div>
+                                                        ))}
+                                                        <p className="help-block">Add up to 6 photos. Use real images of your service.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="card-header">
+                                            <h3 className="card-title">Location</h3>
+                                        </div>
+                                        <div className="row">
+                                            <div className="form-group col-sm-4 col-md-4">
+                                                <label className="form-label text-dark">Country</label>
+                                                <input className="form-control" value={formData.country} readOnly />
+                                            </div>
+                                            <div className="form-group col-sm-4 col-md-4">
+                                                <label className="form-label text-dark">State*</label>
+                                                <input className="form-control" name="state" value={formData.state} onChange={handleChange} placeholder="State" required />
+                                            </div>
+                                            <div className="form-group col-sm-4 col-md-4">
+                                                <label className="form-label text-dark">City*</label>
+                                                <input className="form-control" name="city" value={formData.city} onChange={handleChange} placeholder="City" required />
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div className="card-footer">
+                                        {error && <div className="alert alert-danger mb-2">{error}</div>}
+                                        {success && <div className="alert alert-success mb-2">{success}</div>}
+                                        <div className="col-md-8">
+                                            <button type="submit" className="btn btn-success" disabled={loading}>
+                                                {loading ? 'Submitting...' : 'Submit Ad'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
 
                             </div>
-
-                            <div class="mb10">
-
-                              <input id="input-upload-img2" name="txtimage2" type="file" class="file" data-preview-file-type="text"/>
-
-                            </div>
-
-                            <div class="mb10">
-
-                              <input id="input-upload-img3" name="txtimage3" type="file" class="file" data-preview-file-type="text"/>
-
-                            </div>
-
-                            <div class="mb10">
-
-                              <input id="input-upload-img4" name="txtimage4" type="file" class="file" data-preview-file-type="text"/>
-
-                            </div>
-
-                            <div class="mb10">
-
-                              <input id="input-upload-img5" name="txtimage5" type="file" class="file" data-preview-file-type="text"/>
-
-                            </div>
-
-                            <div class="mb10">
-
-                              <input id="input-upload-img6" name="txtimage6" type="file" class="file" data-preview-file-type="text"/>
-
-                            </div>
-
-                            <p class="help-block">Add up to 6 photos. Use a real image of your product, not catalogs.</p>
-
-                          </div>
-
                         </div>
 
-                      </div>
-
-                    </div>
-
-                    <div class="card-header ">
-
-                      <h3 class="card-title">Location</h3>
-
-                    </div>
-
-                    <div class="row">
-
-                      <input type="hidden" name="txtad-custname" value="<?php echo @$userdetail[0]['custname']; ?>"/>
-
-                        <input type="hidden" name="txtad-cusphone" value="<?php echo @$userdetail[0]['custphone']; ?>"/>
-
-                          <input type="hidden" name="ad_type" value="service"/>
-
-                            <div class="form-group col-sm-4 col-md-4">
-
-                              <label class="form-label text-dark">Country</label>
-
-                              <select class="form-control custom-select1" required>
-
-                                <option value="0">India</option>
-
-                              </select>
-
+                        <div className="col-lg-4 col-md-12">
+                            <div className="card">
+                                <div className="card-header">
+                                    <h3 className="card-title">Terms And Conditions</h3>
+                                </div>
+                                <div className="card-body">
+                                    <ul className="list-unstyled widget-spec mb-0">
+                                        <li>Money Not Refundable</li>
+                                        <li>You can renew your Premium ad after it expires.</li>
+                                        <li>Premium ads are active depending on package.</li>
+                                        <li className="ml-5 mb-0"><a href="tips.html">View more..</a></li>
+                                    </ul>
+                                </div>
                             </div>
-
-                            <div class="form-group col-sm-4 col-md-4">
-
-                              <label class="form-label text-dark">State</label>
-
-                              <select id="txtstate" name="txtstate" class="form-control custom-select1 state" required>
-
-                                <option value="">Select State</option>
-
-                                <option value="<?php echo @$statelist[$sicat]['state_id']; ?>">  </option>
-
-
-
-                              </select>
-
+                            <div className="card mb-0">
+                                <div className="card-header">
+                                    <h3 className="card-title">Safety Tips For Buyers</h3>
+                                </div>
+                                <div className="card-body">
+                                    <ul className="list-unstyled widget-spec mb-0">
+                                        <li>Meet Service Provider at a public place</li>
+                                        <li>Verify credentials before hiring</li>
+                                        <li>Pay only after service is delivered</li>
+                                        <li className="ml-5 mb-0"><a href="tips.html">View more..</a></li>
+                                    </ul>
+                                </div>
                             </div>
-
-                            <div class="form-group col-sm-4 col-md-4">
-
-                              <label class="form-label text-dark">City</label>
-
-                              <select id="txtcity" name="txtcity" class="form-control custom-select1 city" required>
-
-                                <option value="">Select City</option>
-
-
-
-                              </select>
-
-                            </div>
-
-
-
-
-
-                          </div>
-
-
-
                         </div>
 
-                        <div class="card-footer ">
-                          <div class="col-md-8"><input type="submit" name="txtserviceadd" value="Submit Ads" class="btn btn-secondary"/></div>
-                        </div>
-
-                      </form>
-
                     </div>
-
-                  </div>
-
-                  <div class="col-lg-4 col-md-12">
-
-                    <div class="card">
-
-                      <div class="card-header">
-
-                        <h3 class="card-title">Terms And Conditions</h3>
-
-                      </div>
-
-                      <div class="card-body">
-
-                        <ul class="list-unstyled widget-spec  mb-0">
-
-                          <li> <i class="fa fa-check text-success" aria-hidden="true"></i>Money Not Refundable </li>
-
-                          <li> <i class="fa fa-check text-success" aria-hidden="true"></i>You can renew your Premium ad after experted. </li>
-
-                          <li> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads are active for depend on package. </li>
-
-                          <li class="ml-5 mb-0"> <a href="tips.html"> View more..</a> </li>
-
-                        </ul>
-
-                      </div>
-
-                    </div>
-
-                    <div class="card">
-
-                      <div class="card-header">
-
-                        <h3 class="card-title">Benefits Of Premium Ad</h3>
-
-                      </div>
-
-                      <div class="card-body pb-2">
-
-                        <ul class="list-unstyled widget-spec vertical-scroll mb-0" style={{ overflow: "hidden", height: "124px" }}>
-
-                          <li style={{overflow: "hidden" , height: "20.5598px" , paddingTop: "0px" , marginTop: "0px" , paddingBottom: "0px" , marginBottom: "7.83229px"}} class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads are displayed on top </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads will be Show in Google results </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium Ads Active </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads are displayed on top </li>
-
-                          <li style={{overflow: "hidden" , height: "0.593122px" , paddingTop: "0px" , marginTop: "0px" , paddingBottom: "0px", marginBottom: "0.225951px"}} class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads will be Show in Google results </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium Ads Active </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads are displayed on top </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads will be Show in Google results </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium Ads Active </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads are displayed on top </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads will be Show in Google results </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium Ads Active </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads are displayed on top </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads will be Show in Google results </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium Ads Active </li>
-
-                          <li class="undefined"> <i class="fa fa-check text-success" aria-hidden="true"></i>Premium ads are displayed on top </li>
-
-                        </ul>
-
-                      </div>
-
-                    </div>
-
-                    <div class="card mb-0">
-
-                      <div class="card-header">
-
-                        <h3 class="card-title">Safety Tips For Buyers</h3>
-
-                      </div>
-
-                      <div class="card-body">
-
-                        <ul class="list-unstyled widget-spec  mb-0">
-
-                          <li> <i class="fa fa-check text-success" aria-hidden="true"></i> Meet Seller at public Place </li>
-
-                          <li> <i class="fa fa-check text-success" aria-hidden="true"></i> Check item before you buy </li>
-
-                          <li> <i class="fa fa-check text-success" aria-hidden="true"></i> Pay only after collecting item </li>
-
-                          <li class="ml-5 mb-0"> <a href="tips.html"> View more..</a> </li>
-
-                        </ul>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-              </div>
-
-            </div>
-
-          </section>
-
+                </div>
+            </section>
         </>
-        )
+    );
 }

@@ -6,6 +6,7 @@ public/
 .env.local
 .env.production
 .env.development
+.pem
 
 # Build output
 dist/
