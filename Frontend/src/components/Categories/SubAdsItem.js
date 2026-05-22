@@ -5,7 +5,7 @@ import {
   } from "react-router-dom";
 export default function SubAdsItem(props) {
     let {cat_name,imgurl,cat_url,sub_cat_id}=props;
-    const imageUrl = `http://localhost:8000/Images/subcategory/${imgurl}`;
+    const imageUrl = `process.env.REACT_APP_API_URL/Images/subcategory/${imgurl}`;
     cat_url = "/"+cat_url;
   return (
     // SubAdsItem
@@ -13,7 +13,7 @@ export default function SubAdsItem(props) {
        <div className="card overflow-hidden">
             <div className="card-body text-center">
                 <Link to={cat_url}>
-                    <img src={imageUrl}  className="w-9 hh-8" /> 
+                    <img src={imageUrl} loading="lazy" className="w-9 hh-8" /> 
                 </Link>
                 <div className="item-card7-desc">
                     <div className="item-card7-text mt-3"> <a href={cat_url} className="text-dark">

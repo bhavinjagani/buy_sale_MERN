@@ -20,13 +20,13 @@ const GET_USER_ADS = gql`
 `;
 
 function AdRow({ ad, onDelete }) {
-  const img = ad.ad_image ? `http://localhost:8000/Images/uploads/${ad.ad_image.split(',')[0]}` : '/images/no_image.jpg';
+  const img = ad.ad_image ? `process.env.REACT_APP_API_URL/Images/uploads/${ad.ad_image.split(',')[0]}` : '/images/no_image.jpg';
   return (
     <tr>
       <td>
         <div className="media mt-0 mb-0">
           <div className="card-aside-img">
-            <img src={img} alt={ad.ad_title} className="cover-image" style={{ width: 60, height: 50, objectFit: 'cover' }} />
+            <img src={img} loading="lazy"  alt={ad.ad_title} className="cover-image" style={{ width: 60, height: 50, objectFit: 'cover' }} />
           </div>
           <div className="media-body ml-3">
             <Link to={`/ads/view/${ad.ad_id}`} className="text-dark">

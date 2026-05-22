@@ -77,7 +77,7 @@ export default function AdsDescription() {
                                         </span>
                                     )}
                                     <img
-                                        src={`http://localhost:8000/Images/uploads/${images[activeImg]}`}
+                                        src={`process.env.REACT_APP_API_URL/Images/uploads/${images[activeImg]}`}
                                         alt={ad.ad_title}
                                         className="img-fluid rounded"
                                         style={{ width: '100%', height: '380px', objectFit: 'cover' }}
@@ -89,7 +89,7 @@ export default function AdsDescription() {
                                         {images.map((img, i) => (
                                             <img
                                                 key={i}
-                                                src={`http://localhost:8000/Images/uploads/${img}`}
+                                                src={`process.env.REACT_APP_API_URL/Images/uploads/${img}`}
                                                 alt={`thumb-${i}`}
                                                 onClick={() => setActiveImg(i)}
                                                 className="rounded"

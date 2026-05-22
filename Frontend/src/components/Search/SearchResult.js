@@ -95,7 +95,7 @@ export default function SearchResult() {
    
                                                                            <div class="item-card9-imgs"> <a href={`/ads/view/${element.ad_id}`}>
                                                                
-                                                                            <img src={`http://localhost:8000/Images/uploads/${element.ad_image.split(",")[0]}`} /> 
+                                                                            <img  loading="lazy" src={`process.env.REACT_APP_API_URL/Images/uploads/${element.ad_image.split(",")[0]}`} /> 
                                                                                </a>
                                                                            </div>
    

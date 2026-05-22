@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 export default function AdsItem({ cat_name, imgurl, cat_url, adscount }) {
-    const imageUrl = `http://localhost:8000/Images/category/${imgurl}`;
+    const imageUrl = `process.env.REACT_APP_API_URL/Images/category/${imgurl}`;
     return (
         <Link to={cat_url} className="category-card" style={{ textDecoration: 'none' }}>
             <div className="category-card-img-wrap">
