@@ -57,7 +57,7 @@ export default function HomeForSale() {
       if (formData.images.length > 0) {
         const imageForm = new FormData();
         formData.images.forEach(file => imageForm.append('images', file));
-        const uploadRes = await fetch('http://localhost:8000/upload', {
+        const uploadRes = await fetch(`${process.env.REACT_APP_API_URL}/upload`, {
           method: 'POST',
           headers: { authorization: `Bearer ${localStorage.getItem('token')}` },
           body: imageForm,

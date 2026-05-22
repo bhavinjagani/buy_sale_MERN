@@ -16,7 +16,7 @@ export default function AccountHome() {
                   <div className="wideget-user-img">
                     <img
                       className="brround"
-                      src={user?.custimg ? `http://localhost:8000/Images/uploads/users/${user.custimg}` : '/images/user.jpg'}
+                      src={user?.custimg ? `${process.env.REACT_APP_API_URL}/Images/uploads/users/${user.custimg}` : '/images/user.jpg'}
                       alt="user"
                       height="150"
                       width="150"

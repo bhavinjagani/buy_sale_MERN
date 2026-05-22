@@ -18,7 +18,7 @@ export default function AccountLeft() {
             <span className="bg-success dots" data-toggle="tooltip" data-placement="top" title="online"></span>
             <img
               className="brround"
-              src={user?.custimg ? `http://localhost:8000/uploads/users/${user.custimg}` : '/images/user.jpg'}
+              src={user?.custimg ? `${process.env.REACT_APP_API_URL}/uploads/users/${user.custimg}` : '/images/user.jpg'}
               alt="user"
             />
           </div>
