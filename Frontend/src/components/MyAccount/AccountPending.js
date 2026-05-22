@@ -51,9 +51,7 @@ export default function AccountPending() {
               </thead>
               <tbody>
                 {pendingAds.map(ad => {
-                  const img = ad.ad_image
-                    ? `process.env.REACT_APP_API_URL/Images/uploads/${ad.ad_image.split(',')[0]}`
-                    : '/images/no_image.jpg';
+                  const img = `${process.env.REACT_APP_API_URL}/Images/uploads/${ad.ad_image.split(',')[0]}`
                   return (
                     <tr key={ad.ad_id}>
                       <td>
