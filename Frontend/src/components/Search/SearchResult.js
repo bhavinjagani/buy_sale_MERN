@@ -108,7 +108,7 @@ export default function SearchResult() {
    
                                                                            <div class="card-body ">
    
-                                                                               <div class="item-card9"><a href="" class="text-dark">
+                                                                               <div class="item-card9"><a href="#tab2" class="text-dark">
    
                                                                                     <h4 class="font-weight-semibold mt-1 protitle">{element.ad_title} </h4> 
    
