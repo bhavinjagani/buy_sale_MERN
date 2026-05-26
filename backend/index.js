@@ -1,5 +1,6 @@
 import express from 'express';
 import { config } from "dotenv";
+config();
 import cors from "cors";
 import { createServer } from 'http';
 import { readFileSync } from 'fs';
@@ -14,7 +15,7 @@ import { connection } from './database.js';
 import { resolvers } from './graphql/resolvers.js';
 import { getUser } from './middleware/auth.js';
 
-config();
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const typeDefs = readFileSync(join(__dirname, 'graphql/schema.graphql'), 'utf-8');

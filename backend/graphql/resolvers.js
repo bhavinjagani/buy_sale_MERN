@@ -1,4 +1,4 @@
-import { getCategoriesByType, getCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser } from '../models/adsModel.js';
+import { getCategoriesByType, getCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser, deleteAd } from '../models/adsModel.js';
 import { loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword ,findOrCreateGoogleUser} from '../models/userModel.js';
 import { searchallAds, search } from '../models/searchModel.js';
 import { signToken } from '../utils/jwt.js';
@@ -89,6 +89,13 @@ export const resolvers = {
             const result = await changeUserPassword(user.user_id, currentPassword, newPassword);
             return result;
         },
+        deleteAd: async (_, { adId }, { user }) => {
+            if (!user) throw new Error('Not authenticated');
+            const deleted = await deleteAd(adId, user.opid);
+            if (!deleted) return { success: false, message: 'Ad not found or not authorized' };
+            return { success: true, message: 'Ad deleted successfully' };
+        },
+
         googleLogin : async (_,{tokenId})=> {
             const ticket = await googleClient.verifyIdToken({
                 idToken : tokenId,

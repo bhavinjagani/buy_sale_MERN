@@ -1,9 +1,18 @@
 import { useState } from 'react'
 import { gql } from '@apollo/client'
-import { useQuery } from '@apollo/client/react'
+import { useQuery, useMutation } from '@apollo/client/react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { getAdImageUrl } from '../../utils/imageUrl'
+
+const DELETE_AD = gql`
+  mutation DeleteAd($adId: Int!) {
+    deleteAd(adId: $adId) {
+      success
+      message
+    }
+  }
+`;
 
 const GET_USER_ADS = gql`
   query GetUserAds($userId: Int!) {
@@ -56,17 +65,27 @@ export default function AccountMyAds() {
   const user = useSelector((state) => state.auth.user);
   const [activeTab, setActiveTab] = useState('Active');
 
-  const { data, loading, error } = useQuery(GET_USER_ADS, {
+  const { data, loading, error, refetch } = useQuery(GET_USER_ADS, {
     variables: { userId: user?.opid },
     skip: !user?.opid,
   });
 
+  const [deleteAd] = useMutation(DELETE_AD);
+
   const allAds = data?.getUserAds ?? [];
   const filteredAds = allAds.filter(ad => ad.status === activeTab);
 
-  const handleDelete = (_adId) => {
-    if (window.confirm('Are you sure you want to delete this ad?')) {
-      alert('Delete not yet implemented');
+  const handleDelete = async (adId) => {
+    if (!window.confirm('Are you sure you want to delete this ad?')) return;
+    try {
+      const { data } = await deleteAd({ variables: { adId } });
+      if (data.deleteAd.success) {
+        refetch();
+      } else {
+        alert(data.deleteAd.message);
+      }
+    } catch (err) {
+      alert('Failed to delete ad. Please try again.');
     }
   };
 

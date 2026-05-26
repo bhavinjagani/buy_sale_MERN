@@ -254,4 +254,17 @@ const getAdsByUser = (userId) => {
     });
 };
 
-export { getCategoriesByType, getCategoryByName, getSubCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser };
+const deleteAd = (adId, userId) => {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `DELETE FROM ads WHERE ad_id = ? AND user_id = ?`,
+            [adId, userId],
+            (err, result) => {
+                if (err) return reject(err);
+                return resolve(result.affectedRows > 0);
+            }
+        );
+    });
+};
+
+export { getCategoriesByType, getCategoryByName, getSubCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser, deleteAd };
