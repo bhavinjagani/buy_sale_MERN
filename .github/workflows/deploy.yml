@@ -1,0 +1,63 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd Frontend
+          npm ci
+
+      - name: Build frontend
+        env:
+          REACT_APP_GOOGLE_CLIENT_ID: ${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          REACT_APP_S3_URL: ${{ secrets.REACT_APP_S3_URL }}
+        run: |
+          cd Frontend
+          npm run build
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy backend to EC2
+        run: |
+          rsync -avz --exclude='node_modules' --exclude='.env' --exclude='*.sql' \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            backend/ \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/backend/
+
+      - name: Deploy frontend to EC2
+        run: |
+          rsync -avz \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            Frontend/build/ \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/frontend-build/
+
+      - name: Restart backend on EC2
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+            cd ~/backend &&
+            npm install --production &&
+            pm2 restart buysale-backend
+          "
