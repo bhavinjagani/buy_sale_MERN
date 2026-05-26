@@ -6,7 +6,9 @@ public/
 .env.local
 .env.production
 .env.development
-.pem
+*.pem
+*.csv
+*.sql
 
 # Build output
 dist/

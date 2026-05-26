@@ -1,24 +1,42 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { randomUUID } from 'crypto';
 import * as userController from '../controllers/userController.js';
 import * as adsController from '../controllers/adsController.js';
 import * as searchController from '../controllers/searchController.js'
 
 let router = express.Router();
 
-const storage = multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, 'public/Images/uploads/'),
-    filename: (_req, file, cb) => {
-        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, unique + path.extname(file.originalname));
-    }
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId:     process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
 });
-const upload = multer({ storage, limits: { fileSize: 15 * 1024 * 1024 } });
 
-router.post('/upload', upload.array('images', 6), (req, res) => {
-    const filenames = req.files.map(f => f.filename).join(',');
-    res.json({ success: true, filenames });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
+
+router.post('/upload', upload.array('images', 6), async (req, res) => {
+    try {
+        const uploaded = await Promise.all(req.files.map(async (file) => {
+            const ext = path.extname(file.originalname);
+            const key = `uploads/${randomUUID()}${ext}`;
+            await s3.send(new PutObjectCommand({
+                Bucket:      process.env.S3_BUCKET,
+                Key:         key,
+                Body:        file.buffer,
+                ContentType: file.mimetype,
+            }));
+            return key;
+        }));
+        res.json({ success: true, filenames: uploaded.join(',') });
+    } catch (err) {
+        console.error('S3 upload error:', err);
+        res.status(500).json({ success: false, message: 'Upload failed' });
+    }
 });
 
 // userController - Login and Signup

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import contextValue from '../../context/categories/categoriesContext'
 import { useParams } from 'react-router-dom';
+import { getAdImageUrl } from '../../utils/imageUrl'
 
 const Detail = ({ label, value }) => {
     if (!value && value !== 0) return null;
@@ -77,7 +78,7 @@ export default function AdsDescription() {
                                         </span>
                                     )}
                                     <img
-                                        src={`${process.env.REACT_APP_API_URL}/Images/uploads/${images[activeImg]}`}
+                                        src={getAdImageUrl(images[activeImg])}
                                         alt={ad.ad_title}
                                         className="img-fluid rounded"
                                         style={{ width: '100%', height: '380px', objectFit: 'cover' }}
@@ -89,7 +90,7 @@ export default function AdsDescription() {
                                         {images.map((img, i) => (
                                             <img
                                                 key={i}
-                                                src={`${process.env.REACT_APP_API_URL}/Images/uploads/${img}`}
+                                                src={getAdImageUrl(img)}
                                                 alt={`thumb-${i}`}
                                                 onClick={() => setActiveImg(i)}
                                                 className="rounded"

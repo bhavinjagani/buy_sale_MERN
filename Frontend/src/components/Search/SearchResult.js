@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import contextValue from '../../context/categories/categoriesContext'
 import { useSearchParams } from 'react-router-dom';
+import { getAdImageUrl } from '../../utils/imageUrl'
 
 export default function SearchResult() {
  const context = useContext(contextValue)
@@ -95,7 +96,7 @@ export default function SearchResult() {
    
                                                                            <div class="item-card9-imgs"> <a href={`/ads/view/${element.ad_id}`}>
                                                                
-                                                                            <img  loading="lazy" src={`${process.env.REACT_APP_API_URL}/Images/uploads/${element.ad_image.split(",")[0]}`} /> 
+                                                                            <img loading="lazy" src={getAdImageUrl(element.ad_image)} alt={element.ad_title} /> 
                                                                                </a>
                                                                            </div>
    

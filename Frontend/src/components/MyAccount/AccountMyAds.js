@@ -3,6 +3,7 @@ import { gql } from '@apollo/client'
 import { useQuery } from '@apollo/client/react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { getAdImageUrl } from '../../utils/imageUrl'
 
 const GET_USER_ADS = gql`
   query GetUserAds($userId: Int!) {
@@ -20,7 +21,7 @@ const GET_USER_ADS = gql`
 `;
 
 function AdRow({ ad, onDelete }) {
-  const img =`${process.env.REACT_APP_API_URL}/Images/uploads/${ad.ad_image.split(',')[0]}`;
+  const img = getAdImageUrl(ad.ad_image);
   return (
     <tr>
       <td>

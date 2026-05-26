@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react'
 import contextValue from '../../context/categories/categoriesContext'
 import { useParams } from 'react-router-dom';
 import AllCategories from './AllCategories';
+import { getAdImageUrl } from '../../utils/imageUrl'
 import '../../styles/Categories.css';
 import '../../styles/buttons.css'
 export default function AdsLists() {
@@ -95,7 +96,7 @@ export default function AdsLists() {
 
                                                                         <div class="item-card9-imgs"> <a href={`/ads/view/${element.ad_id}`}>
                                                             
-                                                                            <img loading="lazy" src={`${process.env.REACT_APP_API_URL}/Images/uploads/${element.ad_image.split(",")[0]}`} /> 
+                                                                            <img loading="lazy" src={getAdImageUrl(element.ad_image)} alt={element.ad_title} /> 
                                                                             </a>
                                                                         </div>
 

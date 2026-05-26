@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { getUserImageUrl } from '../../utils/imageUrl'
 
 export default function AccountHome() {
   const user = useSelector((state) => state.auth.user);
@@ -16,7 +17,7 @@ export default function AccountHome() {
                   <div className="wideget-user-img">
                     <img
                       className="brround"
-                      src={user?.custimg ? `${process.env.REACT_APP_API_URL}/Images/uploads/users/${user.custimg}` : '/images/user.jpg'}
+                      src={getUserImageUrl(user?.custimg)}
                       alt="user"
                       height="150"
                       width="150"
