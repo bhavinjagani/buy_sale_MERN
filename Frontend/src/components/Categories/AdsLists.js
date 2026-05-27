@@ -11,6 +11,7 @@ export default function AdsLists() {
     const context = useContext(contextValue)
     const { Ads,search,mainCategories} = context;
     const [adsList, setAdsList] = useState([]);
+    const [filter, setFilter] = useState('All');
     let query ={
          category :"",
          itemCondition : null,
@@ -54,13 +55,9 @@ export default function AdsLists() {
                                 <div class="item-search-menu1">
 
                                     <ul class="nav">
-
-                                        <li><a href="#tab2" data-toggle="tab" class="btn btn-secondary">All ads </a></li> {/* (<?php echo count(@$allads); ?>) */}
-
-                                        <li><a href="#tab3" data-toggle="tab" class="btn btn-secondary">New Item Ads </a></li>
-
-                                        <li><a href="#tab4" data-toggle="tab" class="btn btn-secondary">Used Item Ads </a></li>
-
+                                        <li><button onClick={() => setFilter('All')} className={`btn btn-secondary ${filter === 'All' ? 'active' : ''}`}>All Ads ({adsList.length})</button></li>
+                                        <li><button onClick={() => setFilter('New Item')} className={`btn btn-secondary ${filter === 'New Item' ? 'active' : ''}`}>New Ads ({adsList.filter(a => a.item_condition === 'New Item').length})</button></li>
+                                        <li><button onClick={() => setFilter('OLD Item')} className={`btn btn-secondary ${filter === 'OLD Item' ? 'active' : ''}`}>Used Ads ({adsList.filter(a => a.item_condition === 'OLD Item').length})</button></li>
                                     </ul>
 
                                 </div>
@@ -85,7 +82,7 @@ export default function AdsLists() {
                                                     <div class="tab-pane active" id="tab2">
 
                                                         <div class="form row" id="allads">
-                                                        {adsList.map((element) => {
+                                                        {adsList.filter(a => filter === 'All' || a.item_condition === filter).map((element) => {
                                                             return  <div class="card overflow-hidden search-list">
 
                                                                 <div class="d-md-flex">
