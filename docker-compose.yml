@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+
+  backend:
+    build: ./backend
+    platform: linux/amd64
+    container_name: buysale-backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8001:8000"
+    networks:
+      - buysale-network
+
+  frontend:
+    platform: linux/amd64
+    build:
+      context: ./Frontend
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL}
+        REACT_APP_S3_URL: ${REACT_APP_S3_URL}
+        REACT_APP_GOOGLE_CLIENT_ID: ${REACT_APP_GOOGLE_CLIENT_ID}
+    container_name: buysale-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - buysale-network
+
+networks:
+  buysale-network:
+    driver: bridge

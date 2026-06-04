@@ -1,0 +1,10 @@
+node_modules
+.env
+*.sql
+*.log
+*.csv
+*.pem
+.git
+.gitignore
+.github
+public/Images/uploads

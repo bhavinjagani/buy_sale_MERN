@@ -44,6 +44,100 @@ async function startServer() {
 
     await apolloServer.start();
 
+    app.get('/', (_req, res) => {
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8" />
+                <title>Buy & Sale API</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body {
+                        font-family: 'Segoe UI', sans-serif;
+                        background: linear-gradient(135deg, #3ba2ff, #6963ff);
+                        min-height: 100vh;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .card {
+                        background: white;
+                        border-radius: 16px;
+                        padding: 48px 56px;
+                        text-align: center;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+                        max-width: 480px;
+                        width: 90%;
+                    }
+                    .badge {
+                        display: inline-block;
+                        background: #e8f5e9;
+                        color: #2e7d32;
+                        font-size: 13px;
+                        font-weight: 600;
+                        padding: 4px 14px;
+                        border-radius: 20px;
+                        margin-bottom: 20px;
+                        letter-spacing: 0.5px;
+                    }
+                    h1 {
+                        font-size: 28px;
+                        color: #1a1a2e;
+                        margin-bottom: 10px;
+                    }
+                    p {
+                        color: #666;
+                        font-size: 15px;
+                        margin-bottom: 32px;
+                        line-height: 1.6;
+                    }
+                    .links {
+                        display: flex;
+                        gap: 12px;
+                        justify-content: center;
+                        flex-wrap: wrap;
+                    }
+                    a {
+                        padding: 10px 24px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        text-decoration: none;
+                        transition: opacity 0.2s;
+                    }
+                    a:hover { opacity: 0.85; }
+                    .primary {
+                        background: linear-gradient(135deg, #3ba2ff, #6963ff);
+                        color: white;
+                    }
+                    .secondary {
+                        background: #f1f3f5;
+                        color: #333;
+                    }
+                    .footer {
+                        margin-top: 32px;
+                        font-size: 12px;
+                        color: #aaa;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="badge">● Server Running</div>
+                    <h1>Buy &amp; Sale API</h1>
+                    <p>Backend server is up and running.<br/>Use the links below to explore.</p>
+                    <div class="links">
+                        <a href="/graphql" class="primary">GraphQL Playground</a>
+                        <a href="/latestAds" class="secondary">Latest Ads</a>
+                    </div>
+                    <div class="footer">Node.js + Express + Apollo GraphQL</div>
+                </div>
+            </body>
+            </html>
+        `);
+    });
+
     // Existing REST routes
     app.use('/', router);
 
