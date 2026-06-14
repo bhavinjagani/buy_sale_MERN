@@ -1,6 +1,8 @@
 import express from 'express';
 import { config } from "dotenv";
-config();
+const env = process.argv.includes('--production') ? 'production' : 'development';
+config({ path: `.env.${env}` });
+console.log(`Running in ${env} mode`);
 import cors from "cors";
 import { createServer } from 'http';
 import { readFileSync } from 'fs';

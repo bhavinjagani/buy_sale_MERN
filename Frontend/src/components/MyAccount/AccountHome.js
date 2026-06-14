@@ -1,10 +1,25 @@
-import React from 'react'
+import {React,useState }from 'react'
 import { useSelector } from 'react-redux'
 import { getUserImageUrl } from '../../utils/imageUrl'
 
+
 export default function AccountHome() {
   const user = useSelector((state) => state.auth.user);
-
+  const [isSubscribed, setIsSubscribed] = useState(true);
+  
+function unsubscribe(){
+  let payload = {
+    opid: user?.opid,
+    value : isSubscribed
+  }
+  fetch(`${process.env.REACT_APP_API_URL}/unsubscribe`,{
+   method:'POST',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }).then(() => {
+    setIsSubscribed(false);
+  });
+}
   return (
     <>
       <div className="card">
@@ -89,6 +104,9 @@ export default function AccountHome() {
           )}
         </div>
       </div>
+      <button className="btn btn-primary" onClick={unsubscribe}>
+       { isSubscribed  ? "unsubscribe from marketing emails" : "subscribe to marketing emails" }
+      </button>
     </>
   );
 }

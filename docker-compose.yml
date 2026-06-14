@@ -8,7 +8,9 @@ services:
     container_name: buysale-backend
     restart: always
     env_file:
-      - ./backend/.env
+      - ./backend/.env.production
+    environment:
+      - NODE_ENV=production
     ports:
       - "8001:8000"
     networks:

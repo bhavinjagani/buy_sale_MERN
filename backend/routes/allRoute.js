@@ -52,5 +52,6 @@ router.post('/updateAd', adsController.updateAd);
 router.get('/latestAds', adsController.latestAds);
 router.post('/searchAllAds', searchController.getAllAds);
 router.post('/search',searchController.searchAds);
+router.post('/unsubscribe',userController.marketing);
 
 export { router }

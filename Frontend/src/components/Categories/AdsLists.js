@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext,useMemo } from 'react'
 import contextValue from '../../context/categories/categoriesContext'
 import { useParams } from 'react-router-dom';
 import AllCategories from './AllCategories';
@@ -25,7 +25,10 @@ export default function AdsLists() {
         search(query)
         mainCategories()
     }, []);
+     const filterAds = useMemo(()=>{
+        return adsList.filter((ad)=>filter === 'All' || ad.item_condition === filter)
 
+     },[adsList, filter])
     useEffect(() => {
         setAdsList(Ads.map((element) => ({
             ...element,
@@ -82,7 +85,7 @@ export default function AdsLists() {
                                                     <div class="tab-pane active" id="tab2">
 
                                                         <div class="form row" id="allads">
-                                                        {adsList.filter(a => filter === 'All' || a.item_condition === filter).map((element) => {
+                                                        {filterAds.map((element) => {
                                                             return  <div class="card overflow-hidden search-list">
 
                                                                 <div class="d-md-flex">

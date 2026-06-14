@@ -43,4 +43,11 @@ const register = async (req, res) => {
     }
 }
 
-export { login, register }
+const marketing = async(req,res)=> {
+    let { opid, value } = req.body;
+    let result = await marketing(opid, value);
+    res.send(result);
+
+}
+
+export { login, register, marketing }

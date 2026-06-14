@@ -1,7 +1,8 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
-const httpLink = new HttpLink({ uri: 'http://50.17.102.247/graphql' });
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const httpLink = new HttpLink({ uri: `${API_URL}/graphql` });
 
 const authLink = setContext((_, { headers }) => {
     const token = localStorage.getItem('token');

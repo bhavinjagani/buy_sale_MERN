@@ -116,5 +116,18 @@ const findOrCreateGoogleUser = (googleId, email, name) => {
     );
   });
 };
-export { getUser, loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword,findOrCreateGoogleUser };
+const marketing = async (opid, value) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `UPDATE Marketing_Email SET consent = ? WHERE userid = ?`,
+      [value, opid],
+      (err, result) => {
+        if (err) return reject(err);
+        return resolve(result);
+      }
+    );
+  });
+};
 
+
+export { getUser, loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword,findOrCreateGoogleUser, marketing };

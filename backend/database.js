@@ -1,7 +1,8 @@
 import { createConnection } from 'mysql';
 import { config } from 'dotenv';
 
-config();
+const env = process.argv.includes('--production') ? 'production' : 'development';
+config({ path: `.env.${env}` });
 
 const connection = createConnection({
     host: process.env.DB_HOST,

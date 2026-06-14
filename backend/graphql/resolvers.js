@@ -41,6 +41,7 @@ export const resolvers = {
             );
         },
         getUserAds: async (_, { userId }, { user }) => {
+            console.log("this is user details", user);
             if (!user) throw new Error('Not authenticated');
             return await getAdsByUser(userId);
         },

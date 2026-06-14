@@ -46,7 +46,7 @@ const Navbar = () => {
                   <i className="horizontalMenu-arrow fa fa-angle-down"></i></span>
                   <span className="horizontalMenu-click"><i className="horizontalMenu-arrow fa fa-angle-down"></i></span><Link to="#" className="btn-login"><FontAwesomeIcon icon={faHouseChimney} style={{ color: "#000000", }} /><span> My Dashboard</span> <FontAwesomeIcon icon={faCaretDown} style={{ color: "#000000", }} /></Link>
                   {isOpen && <ul className="sub-menu">
-                    <li ><Link to="/myaccount/edit">My Profile</Link></li>
+                    <li ><Link to="/myaccount">My Profile</Link></li>
                     <li ><Link to="/myaccount/myads">My Ads</Link></li>
                     <li ><Link to="/myaccount/pending">Pending Approval</Link></li>
                     <li ><Link role="button" onClick={handleLogout}>Logout</Link></li>
