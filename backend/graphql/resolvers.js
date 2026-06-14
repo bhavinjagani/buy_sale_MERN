@@ -3,6 +3,9 @@ import { loginValidate, addUser, getUserById, updateUserProfile, changeUserPassw
 import { searchallAds, search } from '../models/searchModel.js';
 import { signToken } from '../utils/jwt.js';
 import { OAuth2Client } from 'google-auth-library';
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+
+const lambdaClient = new LambdaClient({ region: 'us-east-1' });
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -69,6 +72,20 @@ export const resolvers = {
         createAd: async (_, { input }, { user }) => {
             if (!user) throw new Error('Not authenticated');
             const result = await createOneAd(input);
+            if(user.email){
+                const payload = {
+                    adTitle: input.ad_title,
+                    sellerEmail : user.email,
+                    sellerName : user.name || user.username,
+                };
+                lambdaClient.send(new InvokeCommand({
+                    FunctionName: 'sendAdNotification',
+                    InvocationType :'Event',
+                    Payload: JSON.stringify(payload),
+                })).catch((err) => {
+                    console.error('Error sending ad notification:', err);
+                })
+            }
             return { success: true, insertId: result.insertId, message: 'Ad created successfully' };
         },
 
