@@ -70,6 +70,7 @@ export const resolvers = {
         },
 
         createAd: async (_, { input }, { user }) => {
+            console.log("this is user details", user);
             if (!user) throw new Error('Not authenticated');
             const result = await createOneAd(input);
             if(user.email){
