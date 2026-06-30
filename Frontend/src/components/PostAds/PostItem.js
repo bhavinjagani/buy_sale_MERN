@@ -2,12 +2,14 @@ import { useState, useContext } from 'react'
 import { useMutation } from "@apollo/client/react";
 import { usePostAdsContext } from './index';
 import contextValue from '../../context/categories/categoriesContext';
-import { CREATE_AD } from './mutations';
+import { CREATE_AD, GENERATE_AD_DESCRIPTION } from './mutations';
+import { generateAdDescription } from '../../utils/generateAdDescription';
 
 export default function Item() {
     const { user, categories } = usePostAdsContext();
     const { subcategories, getSubCategories } = useContext(contextValue);
     const [createAd, { loading }] = useMutation(CREATE_AD);
+    const [generateDescription, { loading: aiLoading }] = useMutation(GENERATE_AD_DESCRIPTION);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -37,6 +39,23 @@ export default function Item() {
         const selected = e.target.value;
         setFormData({ ...formData, category: selected, subCategory: '' });
         if (selected) getSubCategories(selected);
+    };
+
+    const handleGenerateDescription = async () => {
+        if (!formData.adTitle || !formData.category) {
+            setError('Please enter a title and select a category first.');
+            return;
+        }
+        setError('');
+        const description = await generateAdDescription(
+            generateDescription,
+            { title: formData.adTitle, category: formData.category, condition: formData.itemCondition },
+            {
+                'Price':    formData.price,
+                'Location': [formData.city, formData.state, formData.country].filter(Boolean).join(', '),
+            }
+        );
+        setFormData(prev => ({ ...prev, description }));
     };
 
     const postAd = async (e) => {
@@ -147,7 +166,17 @@ export default function Item() {
                       </div>
                     </div>
                     <div class="form-group">
-                      <label class="form-label text-dark">Description</label>
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <label className="form-label text-dark mb-0">Description</label>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={handleGenerateDescription}
+                          disabled={aiLoading}
+                        >
+                          {aiLoading ? '✨ Generating...' : '✨ Generate with AI'}
+                        </button>
+                      </div>
                       <textarea className="form-control" name="description" value={formData.description} onChange={handleChange} rows="6" placeholder="text here.."></textarea>
                     </div>
                     <div class="form-group">

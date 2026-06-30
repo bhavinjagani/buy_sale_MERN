@@ -2,7 +2,8 @@ import { useState, useContext } from 'react'
 import { useMutation } from "@apollo/client/react";
 import { usePostAdsContext } from './index';
 import contextValue from '../../context/categories/categoriesContext';
-import { CREATE_AD } from './mutations';
+import { CREATE_AD, GENERATE_AD_DESCRIPTION } from './mutations';
+import { generateAdDescription } from '../../utils/generateAdDescription';
 
 const YEARS = Array.from({ length: 32 }, (_, i) => 2024 - i);
 
@@ -10,6 +11,7 @@ export default function Vehical() {
     const { user, categories } = usePostAdsContext();
     const { subcategories, getSubCategories } = useContext(contextValue);
     const [createAd, { loading }] = useMutation(CREATE_AD);
+    const [generateDescription, { loading: aiLoading }] = useMutation(GENERATE_AD_DESCRIPTION);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -29,7 +31,7 @@ export default function Vehical() {
         kmDriven:      '',
         itemCondition: 'OLD Item',
         description:   '',
-        country:       'India',
+        country:       'United States',
         state:         '',
         city:          '',
         images:        [],
@@ -119,7 +121,30 @@ export default function Vehical() {
             setError('Failed to post ad. Please try again.');
         }
     };
-
+  const handleGenerateDescription = async () => {
+        if (!formData.adTitle || !formData.category) {
+            setError('Please enter a title and select a category first.');
+            return;
+        }
+        setError('');
+        const description = await generateAdDescription(
+            generateDescription,
+            { title: formData.adTitle, category: formData.category, condition: formData.itemCondition },
+            {
+                'Make':       formData.make,
+                'Model':      formData.model,
+                'Year':       formData.year,
+                'Fuel Type':  formData.fuel,
+                'Color':      formData.color,
+                'KM Driven':  formData.kmDriven ? `${formData.kmDriven} km` : '',
+                'Owner':      formData.owner,
+                'Insurance':  formData.insurance,
+                'Price':      formData.price,
+                'Location':   [formData.city, formData.state, formData.country].filter(Boolean).join(', '),
+            }
+        );
+        setFormData(prev => ({ ...prev, description }));
+    };
     return (
         <>
             <section className="sptb">
@@ -239,6 +264,14 @@ export default function Vehical() {
                                         <div className="form-group">
                                             <label className="form-label text-dark">Description*</label>
                                             <textarea className="form-control" name="description" value={formData.description} onChange={handleChange} rows="6" placeholder="Describe your vehicle..." required></textarea>
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-outline-primary"
+                                                onClick={handleGenerateDescription}
+                                                disabled={aiLoading}
+                                                >
+                                                {aiLoading ? '✨ Generating...' : '✨ Generate with AI'}
+                                                </button>
                                         </div>
 
                                         <div className="form-group">

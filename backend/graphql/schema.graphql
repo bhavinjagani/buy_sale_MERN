@@ -185,5 +185,7 @@ type Mutation {
   changePassword(currentPassword: String!, newPassword: String!): AuthResponse!
   googleLogin(tokenId: String!): AuthResponse
   deleteAd(adId: Int!): AdResult!
+  generateAdDescription(title: String!, category: String!, condition: String,details:String): String!
+
 
 }

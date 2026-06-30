@@ -65,12 +65,12 @@ export default function Facets({ categories = [], location = [] }) {
 
             <div className="facet-search-box">
 
-              {/* Location */}
+              {/* Location
               <a href="#selectRegion" data-bs-toggle="modal" data-bs-target="#exampleModal" className="facet-location-btn" title="Select location">
                 <i className="fa fa-map-marker"></i>
                 <span>{selectedLocation || 'Location'}</span>
                 <i className="fa fa-chevron-down facet-chevron"></i>
-              </a>
+              </a> */}
 
               <div className="facet-divider"></div>
 
@@ -85,10 +85,10 @@ export default function Facets({ categories = [], location = [] }) {
                 </select>
               </div>
 
-              <div className="facet-divider"></div>
+              {/* <div className="facet-divider"></div> */}
 
               {/* Search input */}
-              <div className="facet-input-wrap">
+              {/* <div className="facet-input-wrap">
                 <i className="fa fa-search facet-search-icon"></i>
                 <input
                   type="text"
@@ -102,7 +102,7 @@ export default function Facets({ categories = [], location = [] }) {
 
               <button className="facet-btn" onClick={searchdata}>
                 <i className="fa fa-search mr-1"></i> Search
-              </button>
+              </button> */}
 
             </div>
 

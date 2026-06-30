@@ -1,9 +1,14 @@
 import { getCategoriesByType, getCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser, deleteAd } from '../models/adsModel.js';
-import { loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword ,findOrCreateGoogleUser} from '../models/userModel.js';
+import { loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword, findOrCreateGoogleUser } from '../models/userModel.js';
 import { searchallAds, search } from '../models/searchModel.js';
 import { signToken } from '../utils/jwt.js';
 import { OAuth2Client } from 'google-auth-library';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { GoogleGenAI } from "@google/genai";
+
+const genAI = new GoogleGenAI({
+    apiKey: process.env.GOOGLE_API_KEY,
+});
 
 const lambdaClient = new LambdaClient({ region: 'us-east-1' });
 
@@ -73,15 +78,15 @@ export const resolvers = {
             console.log("this is user details", user);
             if (!user) throw new Error('Not authenticated');
             const result = await createOneAd(input);
-            if(user.email){
+            if (user.email) {
                 const payload = {
                     adTitle: input.ad_title,
-                    sellerEmail : user.email,
-                    sellerName : user.name || user.username,
+                    sellerEmail: user.email,
+                    sellerName: user.name || user.username,
                 };
                 lambdaClient.send(new InvokeCommand({
                     FunctionName: 'sendAdNotification',
-                    InvocationType :'Event',
+                    InvocationType: 'Event',
                     Payload: JSON.stringify(payload),
                 })).catch((err) => {
                     console.error('Error sending ad notification:', err);
@@ -115,16 +120,36 @@ export const resolvers = {
             return { success: true, message: 'Ad deleted successfully' };
         },
 
-        googleLogin : async (_,{tokenId})=> {
+        googleLogin: async (_, { tokenId }) => {
             const ticket = await googleClient.verifyIdToken({
-                idToken : tokenId,
-                audience : process.env.GOOGLE_CLIENT_ID
+                idToken: tokenId,
+                audience: process.env.GOOGLE_CLIENT_ID
             });
-            const {sub:googleId,email,name} = ticket.getPayload();
-            console.log("this is token for authentication",email,name)
-            const user = await findOrCreateGoogleUser(googleId,email,name)
+            const { sub: googleId, email, name } = ticket.getPayload();
+            console.log("this is token for authentication", email, name)
+            const user = await findOrCreateGoogleUser(googleId, email, name)
             const token = signToken(user);
             return { success: true, user: user, token, message: 'Login successful' };
+        },
+        generateAdDescription: async (_, { title, category, condition, details }) => {
+            try {
+                const prompt = `Write a short, compelling classified ad description (3-4 sentences) for this listing:
+                    Title: ${title}
+                    Category: ${category}
+                    Condition: ${condition}${details ? `\n\nAdditional details:\n${details}` : ''}
+                    Keep it concise, highlight key selling points, and make it appealing to buyers.`;
+
+                const result = await genAI.models.generateContent({
+                    model: "gemini-2.5-flash",
+                    contents: prompt,
+                });
+
+                return result.text;
+            } catch (err) {
+                console.error(err);
+                throw err;
+            }
         }
+
     },
 };

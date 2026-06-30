@@ -3,13 +3,14 @@ import { useState, useContext } from 'react'
 import { useMutation } from "@apollo/client/react";
 import { usePostAdsContext } from './index';
 import contextValue from '../../context/categories/categoriesContext';
-import { CREATE_AD } from './mutations';
+import { CREATE_AD, GENERATE_AD_DESCRIPTION } from './mutations';
+import { generateAdDescription } from '../../utils/generateAdDescription';
 
 export default function HomeForSale() {
   const { user } = usePostAdsContext();
   const { subcategories, getSubCategories } = useContext(contextValue);
   const [createAd, { loading }] = useMutation(CREATE_AD);
-
+    const [generateDescription, { loading: aiLoading }] = useMutation(GENERATE_AD_DESCRIPTION);
   React.useEffect(() => {
     getSubCategories('Real Estate');
   }, []);
@@ -105,6 +106,31 @@ export default function HomeForSale() {
       setError('Failed to post ad. Please try again.');
     }
   };
+    const handleGenerateDescription = async () => {
+      try{
+        if (!formData.adTitle) { setError('Please enter a title first.'); return; }
+        setError('');
+        const description = await generateAdDescription(
+            generateDescription,
+            { title: formData.adTitle, category: 'Real Estate', condition: formData.itemCondition },
+            {
+                'Price':               formData.price,
+                'Furnished':           formData.furnished,
+                'Super Built-up Area': formData.superBuiltup ? `${formData.superBuiltup} sq ft` : '',
+                'Carpet Area':         formData.carpetArea   ? `${formData.carpetArea} sq ft`   : '',
+                'Bedrooms':            formData.bedrooms,
+                'Bathrooms':           formData.bathrooms,
+                'Maintenance':         formData.maintenance  ? `${formData.maintenance}/month`   : '',
+                'Parking':             formData.parking,
+                'Location':            [formData.city, formData.state, formData.country].filter(Boolean).join(', '),
+            }
+        );
+
+        setFormData(prev => ({ ...prev, description }));
+      }catch(e){
+        setError('Failed to generate description. Please try again.');
+      }
+    };
 
   return (
     <>
@@ -197,6 +223,14 @@ export default function HomeForSale() {
                     <div className="form-group">
                       <label className="form-label text-dark">Description</label>
                       <textarea className="form-control" name="description" value={formData.description} onChange={handleChange} rows="6" placeholder="text here.."></textarea>
+                       <button
+                          type="button"
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={handleGenerateDescription}
+                          disabled={aiLoading}
+                        >
+                          {aiLoading ? '✨ Generating...' : '✨ Generate with AI'}
+                        </button>
                     </div>
 
                     <div className="form-group">

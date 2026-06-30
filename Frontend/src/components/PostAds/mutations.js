@@ -9,6 +9,11 @@ export const CREATE_AD = gql`
     }
   }
 `;
+export const GENERATE_AD_DESCRIPTION = gql`
+  mutation GenerateAdDescription($title: String!, $category: String!, $condition: String, $details: String) {
+    generateAdDescription(title: $title, category: $category, condition: $condition, details: $details)
+  }
+`;
 
 export const UPDATE_AD = gql`
   mutation UpdateAd($input: AdInput!) {
