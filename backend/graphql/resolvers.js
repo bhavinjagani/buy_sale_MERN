@@ -7,7 +7,7 @@ import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { GoogleGenAI } from "@google/genai";
 
 const genAI = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY,
+    apiKey: process.env.GEMINI_API_KEY,
 });
 
 const lambdaClient = new LambdaClient({ region: 'us-east-1' });
@@ -129,7 +129,6 @@ export const resolvers = {
                 audience: process.env.GOOGLE_CLIENT_ID
             });
             const { sub: googleId, email, name } = ticket.getPayload();
-            console.log("this is token for authentication", email, name)
             const user = await findOrCreateGoogleUser(googleId, email, name)
             const token = signToken(user);
             return { success: true, user: user, token, message: 'Login successful' };
