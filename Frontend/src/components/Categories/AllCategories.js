@@ -18,8 +18,8 @@ export default function AllCategories(props) {
 
   </div>
   <div className="card-body">
-    <ul class="list-unstyled widget-spec p-1 catbox">
-      {categories.map((element) => {
+    <ul class=" widget-spec p-1 catbox">
+      {categories.map((element) => { 
         if(element.cat_name === name){
           imgUrl = `/Images/category/${element.cat_img}`;
           adsCount = element.adscount;
