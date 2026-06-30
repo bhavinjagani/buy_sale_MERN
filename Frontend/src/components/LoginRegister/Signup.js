@@ -1,52 +1,68 @@
 import React, { useState } from 'react'
 import '../../styles/Signup.css'
-import {
-  Link,
-  useNavigate
-} from "react-router-dom";
-import Facebook from '../../Icons/Facebook';
-import Google from '../../Icons/Google';
+import { Link, useNavigate } from "react-router-dom";
 import '../../styles/buttons.css';
 import Alert from '../Alert';
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/authSlice';
+import { useMutation } from "@apollo/client/react";
+import { gql } from "@apollo/client";
+
+const REGISTER = gql`
+  mutation Register($username: String!, $name: String!, $password: String!) {
+    register(username: $username, name: $name, password: $password) {
+      success
+      message
+      token
+      user {
+        user_id
+        custname
+        username
+        opid
+        weblink
+        state
+        custimg
+        custaddress
+        aboutme
+        custemail
+      }
+    }
+  }
+`;
+
 export default function Signup(props) {
-  const [cred, setCred] = useState({ name: "", username: "", password: "" })
-  let navigate = useNavigate()
+  const dispatch = useDispatch();
+  const [registerMutation] = useMutation(REGISTER);
+  const [cred, setCred] = useState({ name: "", username: "", password: "" });
+  let navigate = useNavigate();
+
   const handleSignup = async (e) => {
-    console.log("cred", cred)
-    e.preventDefault()
-    const { name, username, password } = cred;
-    const response = await fetch(`http://localhost:5000/register`, {
-
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, username, password }),
-    });
-
-    console.log("response", response)
-    if (response.status === 200) {
-      //const json =await response.json()
-      // save the token and redirect
-      //localStorage.setItem('token',json.authtoken)
-      navigate("/")
-      props.handlelogInlogOut(true)
-      props.showAlert("Account Created Sucessfully", "success")
-    }
-    else {
-      props.showAlert("Invlid Credatials", "danagar")
+    e.preventDefault();
+    try {
+      const { data } = await registerMutation({
+        variables: { username: cred.username, name: cred.name, password: cred.password },
+      });
+      if (data.register.success) {
+        dispatch(login({ user: data.register.user, token: data.register.token }));
+        navigate("/");
+        props.showAlert("Account Created Successfully", "success");
+      } else {
+        props.showAlert(data.register.message || "Registration failed", "danger");
+      }
+    } catch (err) {
+      props.showAlert("Something went wrong", "danger");
     }
   }
+
   const onChange = (e) => {
-
-    setCred({ ...cred, [e.target.name]: e.target.value })
-
+    setCred({ ...cred, [e.target.name]: e.target.value });
   }
+
   return (
     <>
-      <section className="sptb" >
+      <section className="sptb">
         <div className="container customerpage">
-          <div className="row ">
+          <div className="row">
             <div className="col-lg-4 d-block mx-auto">
               <div className="row">
                 <div className="col-xl-12 col-md-12 col-md-12">
@@ -55,12 +71,7 @@ export default function Signup(props) {
                       <h3 className="card-title">Register</h3>
                     </div>
                     <div className="card-body">
-                      <div className="text-center">
-                        <div className="btn-group btn-block mt-2 mb-2"> <a href="https://www.facebook.com/" className="btn btn-facebook active">   <Facebook className={"icon-facebook"} width={'24px'} height={"1em"} /></a>  <a href="https://www.facebook.com/" className="btn btn-block btn-facebook">Facebook</a> </div>
-                        <div className="btn-group btn-block mt-2 mb-2"> <a href="https://www.google.com/gmail/" className="btn btn-google active"> <Google className={"icon-facebook"} width={'24px'} height={"1em"} /> </a> <a href="https://www.google.com/gmail/" className="btn btn-block btn-google">Google</a> </div>
-                      </div>
-                      <hr className="divider" />
-                      <form className="form-horizontal" method="post" onSubmit={handleSignup}>
+                      <form className="form-horizontal" onSubmit={handleSignup}>
                         <fieldset>
                           <div className="form-group">
                             <label className="form-label text-dark">Name</label>
@@ -77,14 +88,14 @@ export default function Signup(props) {
                           <div className="form-group">
                             <label className="custom-checkbox">
                               <input type="checkbox" className="custom-control-input" />
-                              <span className="custom-control-label text-dark">Agree the <a href="<?php echo base_url(); ?>terms">terms and policy</a></span> </label>
+                              <span className="custom-control-label text-dark">Agree the <a href="/terms">terms and policy</a></span>
+                            </label>
                           </div>
                           <Alert alert={props.alert}></Alert>
                           <div className="form-footer mt-2">
                             <input type="submit" name="txtsignupbtn" value="Create New Account" className="btn btn-primary btn-block" />
                           </div>
-                          <div className="text-center  mt-3 text-dark"> Already have account?<Link to="/login"> SignIn</Link> </div>
-
+                          <div className="text-center mt-3 text-dark">Already have account?<Link to="/login"> SignIn</Link></div>
                         </fieldset>
                       </form>
                     </div>
@@ -95,7 +106,6 @@ export default function Signup(props) {
           </div>
         </div>
       </section>
-
     </>
   )
 }

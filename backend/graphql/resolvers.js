@@ -1,5 +1,5 @@
 import { getCategoriesByType, getCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser, deleteAd } from '../models/adsModel.js';
-import { loginValidate, addUser, getUserById, updateUserProfile, changeUserPassword, findOrCreateGoogleUser } from '../models/userModel.js';
+import { loginValidate, addUser, getUser, getUserById, updateUserProfile, changeUserPassword, findOrCreateGoogleUser } from '../models/userModel.js';
 import { searchallAds, search } from '../models/searchModel.js';
 import { signToken } from '../utils/jwt.js';
 import { OAuth2Client } from 'google-auth-library';
@@ -69,7 +69,10 @@ export const resolvers = {
         register: async (_, { username, name, password }) => {
             const added = await addUser(username, name, password);
             if (added) {
-                return { success: true, message: 'User registered successfully' };
+                const results = await getUser(username);
+                const dbUser = results[0];
+                const token = signToken(dbUser);
+                return { success: true, message: 'User registered successfully', user: dbUser, token };
             }
             return { success: false, message: 'Username already exists' };
         },
