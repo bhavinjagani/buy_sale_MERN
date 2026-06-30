@@ -18,7 +18,7 @@ export default function AllCategories(props) {
 
   </div>
   <div className="card-body">
-    <ul class=" widget-spec p-1 catbox">
+    <ul class="widget-spec p-1 catbox">
       {categories.map((element) => { 
         if(element.cat_name === name){
           imgUrl = `/Images/category/${element.cat_img}`;
