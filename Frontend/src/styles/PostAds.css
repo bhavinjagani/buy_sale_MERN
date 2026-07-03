@@ -23,6 +23,22 @@ a {
     -webkit-text-decoration-skip: objects;
 }
 
+/* ── PostAds responsive ── */
+@media (max-width: 576px) {
+    /* On small screens, 3-col form rows become 2-col */
+    .form-group.col-sm-4 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    .icon-service {
+        width: 60px;
+        height: 60px;
+    }
+    .icon-bgx i {
+        font-size: 1.8rem;
+    }
+}
+
 .font-weight-semibold {
     font-weight: 500 !important;
 }

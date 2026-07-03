@@ -152,3 +152,56 @@
     font-size: 0.9rem;
 }
 .widget-spec li i { margin-right: 0.5rem; margin-top: 3px; }
+
+/* ── Responsive ── */
+@media (max-width: 576px) {
+    .cat-section-header h2 {
+        font-size: 1.4rem;
+    }
+    .category-card-img-wrap {
+        min-height: 100px;
+        padding: 16px;
+    }
+    .category-card-img-wrap img {
+        width: 52px;
+        height: 52px;
+    }
+    .category-card-name {
+        font-size: 0.82rem;
+    }
+    /* Search result cards stack cleanly */
+    .search-list .d-md-flex {
+        flex-direction: column;
+    }
+    .item-card9-img {
+        max-width: 100%;
+    }
+    .item-card9-img img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    /* PostAds type chooser icons */
+    .icon-service {
+        width: 60px;
+        height: 60px;
+    }
+    .sptb {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .item2-gl-nav {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .item2-gl-nav .item-search-menu1 ul {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .ad-detail-img {
+        height: 240px !important;
+    }
+}

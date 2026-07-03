@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link } from "react-router-dom";
 import logoImg from '../img/bnslogo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignInAlt, faUser, faHouseChimney, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { faSignInAlt, faUser, faHouseChimney, faCaretDown, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/authSlice';
@@ -10,56 +10,111 @@ import '../styles/Navbar.css'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const dispatch = useDispatch();
   let navigate = useNavigate();
 
   const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/");
+    closeMobileMenu();
   };
 
   const postFreeAd = () => {
+    closeMobileMenu();
     if (isLoggedIn) {
       navigate("/postads");
     } else {
       navigate("/login");
     }
   };
+
   return (
     <>
-      <nav className="navbar  navbar-expand-lg header">
-        <div className="container-fluid">
-          <div className='mx-2 w-2/3'>
-            <div className='header-logo-wrapper w-1/3'>
-              <Link to="/"><img src={logoImg} style={{ height: "120px" }} alt="My Logo" /></Link>
-            </div>
-          </div>
-          <div className='d-flex w-1/3 justify-center'>
-            {!isLoggedIn ? <form className="d-flex" role="search">
-              <Link to="login" className="btn-login"><FontAwesomeIcon icon={faSignInAlt} style={{ color: "#000000", marginRight: "0.25rem" }} /><span>Login</span></Link>
-              <Link to="signup" className='btn-login'><FontAwesomeIcon icon={faUser} style={{ color: "#000000", marginRight: "0.25rem" }} /> <span>Register</span> </Link></form> :
-              <form>
-                <ul className="horizontalMenu-list"> <li onClick={toggleDropdown}><span className="horizontalMenu-click">
-                  <i className="horizontalMenu-arrow fa fa-angle-down"></i></span>
-                  <span className="horizontalMenu-click"><i className="horizontalMenu-arrow fa fa-angle-down"></i></span><Link to="#" className="btn-login"><FontAwesomeIcon icon={faHouseChimney} style={{ color: "#000000", }} /><span> My Dashboard</span> <FontAwesomeIcon icon={faCaretDown} style={{ color: "#000000", }} /></Link>
-                  {isOpen && <ul className="sub-menu">
-                    <li ><Link to="/myaccount">My Profile</Link></li>
-                    <li ><Link to="/myaccount/myads">My Ads</Link></li>
-                    <li ><Link to="/myaccount/pending">Pending Approval</Link></li>
-                    <li ><Link role="button" onClick={handleLogout}>Logout</Link></li>
-                  </ul>}
-                </li> </ul>
-              </form>}
-            <button  className="btn btn-secondary mx-2" style={{ fontSize: "1.3rem" }} role="button" onClick={postFreeAd}>Post Free Ad</button>
+      <nav className="navbar header">
+        <div className="navbar-inner container-fluid">
 
+          {/* Logo */}
+          <div className="navbar-brand">
+            <Link to="/" onClick={closeMobileMenu}>
+              <img src={logoImg} className="navbar-logo" alt="Buynsale Logo" />
+            </Link>
           </div>
+
+          {/* Desktop actions */}
+          <div className="navbar-desktop-actions">
+            {!isLoggedIn ? (
+              <>
+                <Link to="login" className="btn-login">
+                  <FontAwesomeIcon icon={faSignInAlt} style={{ marginRight: "0.25rem" }} />
+                  <span>Login</span>
+                </Link>
+                <Link to="signup" className="btn-login">
+                  <FontAwesomeIcon icon={faUser} style={{ marginRight: "0.25rem" }} />
+                  <span>Register</span>
+                </Link>
+              </>
+            ) : (
+              <div className="nav-dashboard-wrap">
+                <button className="btn-login nav-dashboard-btn" onClick={toggleDropdown}>
+                  <FontAwesomeIcon icon={faHouseChimney} style={{ marginRight: "0.35rem" }} />
+                  <span>My Dashboard</span>
+                  <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: "0.3rem" }} />
+                </button>
+                {isOpen && (
+                  <ul className="sub-menu">
+                    <li><Link to="/myaccount" onClick={() => setIsOpen(false)}>My Profile</Link></li>
+                    <li><Link to="/myaccount/myads" onClick={() => setIsOpen(false)}>My Ads</Link></li>
+                    <li><Link to="/myaccount/pending" onClick={() => setIsOpen(false)}>Pending Approval</Link></li>
+                    <li><button className="sub-menu-btn" onClick={handleLogout}>Logout</button></li>
+                  </ul>
+                )}
+              </div>
+            )}
+            <button className="btn btn-secondary navbar-post-btn" onClick={postFreeAd}>
+              Post Free Ad
+            </button>
+          </div>
+
+          {/* Hamburger toggle (mobile only) */}
+          <button className="navbar-hamburger" onClick={toggleMobileMenu} aria-label="Toggle menu">
+            <FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} />
+          </button>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="navbar-mobile-menu">
+            {!isLoggedIn ? (
+              <>
+                <Link to="login" className="mobile-nav-link" onClick={closeMobileMenu}>
+                  <FontAwesomeIcon icon={faSignInAlt} style={{ marginRight: "0.5rem" }} />Login
+                </Link>
+                <Link to="signup" className="mobile-nav-link" onClick={closeMobileMenu}>
+                  <FontAwesomeIcon icon={faUser} style={{ marginRight: "0.5rem" }} />Register
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/myaccount" className="mobile-nav-link" onClick={closeMobileMenu}>My Profile</Link>
+                <Link to="/myaccount/myads" className="mobile-nav-link" onClick={closeMobileMenu}>My Ads</Link>
+                <Link to="/myaccount/pending" className="mobile-nav-link" onClick={closeMobileMenu}>Pending Approval</Link>
+                <button className="mobile-nav-link mobile-nav-logout" onClick={handleLogout}>Logout</button>
+              </>
+            )}
+            <button className="btn btn-secondary mobile-nav-post-btn" onClick={postFreeAd}>
+              Post Free Ad
+            </button>
+          </div>
+        )}
       </nav>
     </>
-  )
-
+  );
 }
+
 export default Navbar;

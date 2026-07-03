@@ -106,3 +106,43 @@ aside{
 .my-dash li {
     list-style-type: none;
 }
+
+/* ── Mobile sidebar: horizontal scrollable nav ── */
+@media (max-width: 991px) {
+    .my-dash.app-sidebar {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .my-dash .side-menu {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        padding: 0;
+        margin: 0;
+        overflow-x: auto;
+    }
+    .my-dash .slide {
+        flex-shrink: 0;
+    }
+    .my-dash .side-menu__item {
+        white-space: nowrap;
+        border-top: none;
+        border-bottom: 3px solid transparent;
+        padding: 0.75rem 1rem;
+    }
+    .my-dash.app-sidebar .side-menu__item.active {
+        border-right: none;
+        border-bottom: 3px solid #6963ff;
+    }
+}
+
+/* ── Spacing ── */
+@media (max-width: 576px) {
+    .card-body {
+        padding: 0.5rem 1rem 1rem 1rem !important;
+    }
+    .sptb {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+}

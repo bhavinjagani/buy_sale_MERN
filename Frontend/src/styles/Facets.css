@@ -215,17 +215,18 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .facet-hero {
+        min-height: 280px;
+    }
     .facet-search-box {
         flex-direction: column;
         border-radius: 16px;
         padding: 8px;
         gap: 4px;
     }
-
     .facet-divider {
         display: none;
     }
-
     .facet-location-btn,
     .facet-category-wrap,
     .facet-input-wrap {
@@ -233,19 +234,29 @@
         padding: 8px 12px;
         border-bottom: 1px solid #f3f4f6;
     }
-
     .facet-btn {
         width: 100%;
         border-radius: 10px;
         padding: 12px;
         text-align: center;
     }
-
     .facet-heading h1 {
-        font-size: 1.7rem;
+        font-size: 1.5rem;
     }
-
+    .facet-heading p {
+        font-size: 0.9rem;
+    }
     .facet-select-inline {
         max-width: 100%;
+    }
+    .facet-content {
+        padding: 2rem 0 1.5rem;
+    }
+    .facet-pills {
+        gap: 6px;
+    }
+    .facet-pill {
+        font-size: 0.78rem;
+        padding: 5px 12px;
     }
 }
