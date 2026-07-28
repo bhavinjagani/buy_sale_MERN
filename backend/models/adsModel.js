@@ -203,6 +203,15 @@ const getLatestAds = async () => {
     });
     return latestAdsResponse;
 };
+const getAllActiveAds = async () => {
+    let query = `SELECT ad_id, ad_title, ad_description, price, city, state FROM ads WHERE status = 'Active'`;
+    return await new Promise((resolve, reject) => {
+        connection.query(query, (err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+        });
+    });
+};
 
 const getAdById = async (id) =>{
     let query = `SELECT * FROM ads WHERE ad_id = ${connection.escape(id)} LIMIT 1`;
@@ -267,4 +276,4 @@ const deleteAd = (adId, userId) => {
     });
 };
 
-export { getCategoriesByType, getCategoryByName, getSubCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser, deleteAd };
+export { getCategoriesByType, getCategoryByName,getAllActiveAds, getSubCategoryByName, getSubCategoriesByNameorID, createOneAd, updateOneAd, getLatestAds, getAdById, getLocations, getAdsByUser, deleteAd };
