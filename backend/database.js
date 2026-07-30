@@ -1,4 +1,4 @@
-import { createConnection } from 'mysql2';
+import { createConnection } from 'mysql';
 import { config } from 'dotenv';
 
 const env = process.argv.includes('--production') ? 'production' : 'development';
